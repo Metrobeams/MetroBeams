@@ -1,4 +1,8 @@
 defmodule PlataformaWeb.NotificationIcons do
+  @moduledoc """
+  SVG icon components for notification types (info, success, warning, error).
+  """
+
   use Phoenix.Component
 
   @icon_colors %{

@@ -1,4 +1,8 @@
 defmodule Plataforma.Media.Avatar do
+  @moduledoc """
+  Avatar upload, retrieval, and removal logic.
+  """
+
   alias Plataforma.Accounts
 
   require Logger

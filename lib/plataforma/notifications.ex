@@ -1,4 +1,8 @@
 defmodule Plataforma.Notifications do
+  @moduledoc """
+  Context for managing user notifications.
+  """
+
   import Ecto.Query
 
   alias Plataforma.Accounts.User

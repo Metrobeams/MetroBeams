@@ -1,4 +1,8 @@
 defmodule Plataforma.Organizations.InvitationEmail do
+  @moduledoc """
+  Builds invitation emails for organization membership.
+  """
+
   import Swoosh.Email
 
   alias Plataforma.Organizations.Invitation

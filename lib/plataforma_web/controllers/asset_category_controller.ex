@@ -78,7 +78,6 @@ defmodule PlataformaWeb.AssetCategoryController do
   defp require_organization(conn, _opts) do
     case conn.assigns do
       %{current_scope: %Scope{user: user}} ->
-        # Get the first organization the user belongs to with membership
         query =
           from org in Plataforma.Organizations.Organization,
             join: m in Plataforma.Organizations.Membership,
@@ -95,30 +94,33 @@ defmodule PlataformaWeb.AssetCategoryController do
             |> Plug.Conn.halt()
 
           {organization, membership} ->
-            # Check if user has permission to manage categories
-            case Bodyguard.permit(
-                   Plataforma.Organizations.Policy,
-                   :manage_categories,
-                   membership,
-                   organization
-                 ) do
-              :ok ->
-                conn
-                |> Plug.Conn.assign(:organization, organization)
-                |> Plug.Conn.assign(:membership, membership)
-
-              {:error, :unauthorized} ->
-                conn
-                |> put_flash(:error, "Você não tem permissão para acessar esta funcionalidade.")
-                |> redirect(to: ~p"/")
-                |> Plug.Conn.halt()
-            end
+            permit_and_assign(conn, membership, organization)
         end
 
       _ ->
         conn
         |> put_flash(:error, "Faça login para continuar.")
         |> redirect(to: ~p"/users/log-in")
+        |> Plug.Conn.halt()
+    end
+  end
+
+  defp permit_and_assign(conn, membership, organization) do
+    case Bodyguard.permit(
+           Plataforma.Organizations.Policy,
+           :manage_categories,
+           membership,
+           organization
+         ) do
+      :ok ->
+        conn
+        |> Plug.Conn.assign(:organization, organization)
+        |> Plug.Conn.assign(:membership, membership)
+
+      {:error, :unauthorized} ->
+        conn
+        |> put_flash(:error, "Você não tem permissão para acessar esta funcionalidade.")
+        |> redirect(to: ~p"/")
         |> Plug.Conn.halt()
     end
   end

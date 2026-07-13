@@ -1,4 +1,8 @@
 defmodule PlataformaWeb.UserAuth do
+  @moduledoc """
+  Authentication plugs and helpers for verifying user sessions.
+  """
+
   use PlataformaWeb, :verified_routes
 
   import Plug.Conn

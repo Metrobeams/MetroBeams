@@ -1,4 +1,8 @@
 defmodule PlataformaWeb.Plugs.RequireJSONContentType do
+  @moduledoc """
+  Plug that requires requests to have application/json content type.
+  """
+
   import Plug.Conn
 
   @content_type "application/json"

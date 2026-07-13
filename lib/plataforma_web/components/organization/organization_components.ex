@@ -1,4 +1,8 @@
 defmodule PlataformaWeb.OrganizationComponents do
+  @moduledoc """
+  Components for organization-related UI elements.
+  """
+
   use PlataformaWeb, :html
 
   # Vendored paths keep the official Carbon icons available in server-rendered templates.

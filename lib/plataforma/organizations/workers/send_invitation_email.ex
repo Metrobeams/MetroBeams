@@ -1,4 +1,8 @@
 defmodule Plataforma.Organizations.Workers.SendInvitationEmail do
+  @moduledoc """
+  Oban worker for sending organization invitation emails.
+  """
+
   use Oban.Worker,
     queue: :mailers,
     max_attempts: 5,

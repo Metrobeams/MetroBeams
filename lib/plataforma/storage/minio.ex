@@ -1,4 +1,8 @@
 defmodule Plataforma.Storage.MinIO do
+  @moduledoc """
+  S3-compatible storage implementation using MinIO.
+  """
+
   @behaviour Plataforma.Storage
 
   require Logger

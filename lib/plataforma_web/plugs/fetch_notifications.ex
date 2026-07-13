@@ -1,4 +1,8 @@
 defmodule PlataformaWeb.Plugs.FetchNotifications do
+  @moduledoc """
+  Plug that fetches and assigns notification summary for the current user.
+  """
+
   import Plug.Conn
 
   alias Plataforma.Notifications

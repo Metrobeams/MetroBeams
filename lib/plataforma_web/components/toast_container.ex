@@ -1,4 +1,8 @@
 defmodule PlataformaWeb.ToastContainer do
+  @moduledoc """
+  Toast notification container component for displaying flash messages.
+  """
+
   use Phoenix.Component
   alias PlataformaWeb.NotificationIcons
 

@@ -1,4 +1,8 @@
 defmodule Plataforma.Organizations do
+  @moduledoc """
+  Context for managing organizations, memberships, and invitations.
+  """
+
   import Ecto.Query
 
   alias Ecto.Multi
@@ -120,12 +124,14 @@ defmodule Plataforma.Organizations do
           {:ok, Organization.t()} | {:error, :unauthorized | Ecto.Changeset.t()}
   def deactivate_organization(actor, organization) do
     with {:ok, _actor} <- permit_actor(actor, :deactivate_organization, organization) do
-      Repo.transaction(fn ->
-        case organization |> Organization.changeset(%{active: false}) |> Repo.update() do
-          {:ok, deactivated} -> deactivated
-          {:error, changeset} -> Repo.rollback(changeset)
-        end
-      end)
+      Repo.transaction(fn -> do_deactivate_organization(organization) end)
+    end
+  end
+
+  defp do_deactivate_organization(organization) do
+    case organization |> Organization.changeset(%{active: false}) |> Repo.update() do
+      {:ok, deactivated} -> deactivated
+      {:error, changeset} -> Repo.rollback(changeset)
     end
   end
 
@@ -133,25 +139,19 @@ defmodule Plataforma.Organizations do
           {:ok, Membership.t()} | {:error, :unauthorized | :last_owner | Ecto.Changeset.t()}
   def deactivate_member(actor, organization, target) do
     with {:ok, _actor} <- permit_actor(actor, :deactivate_member, organization) do
-      Repo.transaction(fn ->
-        locked_owners = lock_active_owners(organization.id)
-        active_owner_count = count_active_owners(organization.id)
+      Repo.transaction(fn -> do_deactivate_member(organization, target) end)
+    end
+  end
 
-        case locked_target(target.id, organization.id, locked_owners) do
-          nil ->
-            Repo.rollback(:not_found)
+  defp do_deactivate_member(organization, target) do
+    locked_owners = lock_active_owners(organization.id)
+    active_owner_count = count_active_owners(organization.id)
 
-          scoped_target ->
-            if removes_last_owner?(scoped_target, active_owner_count) do
-              Repo.rollback(:last_owner)
-            else
-              case scoped_target |> Membership.changeset(%{active: false}) |> Repo.update() do
-                {:ok, membership} -> membership
-                {:error, changeset} -> Repo.rollback(changeset)
-              end
-            end
-        end
-      end)
+    with {:ok, scoped_target} <- locked_target_ok(target.id, organization.id, locked_owners),
+         :ok <- check_not_last_owner(scoped_target, active_owner_count) do
+      update_membership(scoped_target, %{active: false})
+    else
+      {:error, reason} -> Repo.rollback(reason)
     end
   end
 
@@ -175,25 +175,19 @@ defmodule Plataforma.Organizations do
           | {:error, :unauthorized | :last_owner | Ecto.Changeset.t()}
   def change_member_role(actor, organization, target, role) do
     with {:ok, _actor} <- permit_actor(actor, :change_member_role, organization) do
-      Repo.transaction(fn ->
-        locked_owners = lock_active_owners(organization.id)
-        active_owner_count = count_active_owners(organization.id)
+      Repo.transaction(fn -> do_change_member_role(organization, target, role) end)
+    end
+  end
 
-        case locked_target(target.id, organization.id, locked_owners) do
-          nil ->
-            Repo.rollback(:not_found)
+  defp do_change_member_role(organization, target, role) do
+    locked_owners = lock_active_owners(organization.id)
+    active_owner_count = count_active_owners(organization.id)
 
-          scoped_target ->
-            if role != :owner and removes_last_owner?(scoped_target, active_owner_count) do
-              Repo.rollback(:last_owner)
-            else
-              case scoped_target |> Membership.changeset(%{role: role}) |> Repo.update() do
-                {:ok, membership} -> membership
-                {:error, changeset} -> Repo.rollback(changeset)
-              end
-            end
-        end
-      end)
+    with {:ok, scoped_target} <- locked_target_ok(target.id, organization.id, locked_owners),
+         :ok <- check_role_change_allowed(scoped_target, role, active_owner_count) do
+      update_membership(scoped_target, %{role: role})
+    else
+      {:error, reason} -> Repo.rollback(reason)
     end
   end
 
@@ -223,6 +217,32 @@ defmodule Plataforma.Organizations do
   defp locked_target(target_id, organization_id, locked_owners) do
     Enum.find(locked_owners, &(&1.id == target_id)) ||
       get_scoped_membership(target_id, organization_id, lock: true)
+  end
+
+  defp locked_target_ok(target_id, organization_id, locked_owners) do
+    case locked_target(target_id, organization_id, locked_owners) do
+      nil -> {:error, :not_found}
+      target -> {:ok, target}
+    end
+  end
+
+  defp check_not_last_owner(scoped_target, active_owner_count) do
+    if removes_last_owner?(scoped_target, active_owner_count),
+      do: {:error, :last_owner},
+      else: :ok
+  end
+
+  defp check_role_change_allowed(_scoped_target, :owner, _active_owner_count), do: :ok
+
+  defp check_role_change_allowed(scoped_target, _role, active_owner_count) do
+    check_not_last_owner(scoped_target, active_owner_count)
+  end
+
+  defp update_membership(membership, attrs) do
+    case membership |> Membership.changeset(attrs) |> Repo.update() do
+      {:ok, updated} -> updated
+      {:error, changeset} -> Repo.rollback(changeset)
+    end
   end
 
   defp removes_last_owner?(%Membership{role: :owner, active: true}, active_owner_count),
@@ -259,18 +279,7 @@ defmodule Plataforma.Organizations do
       end)
       |> Multi.insert(:invitation, invitation_changeset)
       |> Multi.run(:notification, fn repo, %{invitation: invitation} ->
-        case Accounts.get_user_by_email(invitation.email) do
-          nil ->
-            {:ok, nil}
-
-          user ->
-            Notifications.notify_organization_invitation(
-              repo,
-              user,
-              invitation,
-              organization
-            )
-        end
+        notify_invitation(repo, invitation, organization)
       end)
       |> Oban.insert(:invitation_email_job, fn %{invitation: invitation} ->
         SendInvitationEmail.new(%{"invitation_id" => invitation.id})
@@ -303,6 +312,16 @@ defmodule Plataforma.Organizations do
     end
   end
 
+  defp notify_invitation(repo, invitation, organization) do
+    case Accounts.get_user_by_email(invitation.email) do
+      nil ->
+        {:ok, nil}
+
+      user ->
+        Notifications.notify_organization_invitation(repo, user, invitation, organization)
+    end
+  end
+
   @spec accept_invitation(struct(), String.t()) ::
           {:ok, Membership.t()}
           | {:error,
@@ -326,27 +345,30 @@ defmodule Plataforma.Organizations do
   @spec revoke_invitation(Membership.t(), Invitation.t()) ::
           {:ok, Invitation.t()} | {:error, :unauthorized | :already_accepted | Ecto.Changeset.t()}
   def revoke_invitation(actor, invitation) do
-    with {:ok, actor} <- reload_actor(actor) do
-      scoped_invitation =
-        Repo.one(
-          from item in Invitation,
-            join: organization in assoc(item, :organization),
-            where: item.id == ^invitation.id and item.organization_id == ^actor.organization_id,
-            preload: [organization: organization]
-        )
+    with {:ok, actor} <- reload_actor(actor),
+         {:ok, scoped_invitation} <- find_scoped_invitation(invitation, actor) do
+      revoke_with_permission(scoped_invitation, actor)
+    end
+  end
 
-      case scoped_invitation do
-        nil ->
-          {:error, :not_found}
+  defp find_scoped_invitation(invitation, actor) do
+    case Repo.one(
+           from item in Invitation,
+             join: organization in assoc(item, :organization),
+             where: item.id == ^invitation.id and item.organization_id == ^actor.organization_id,
+             preload: [organization: organization]
+         ) do
+      nil -> {:error, :not_found}
+      scoped -> {:ok, scoped}
+    end
+  end
 
-        invitation ->
-          with :ok <- Bodyguard.permit(Policy, :invite_member, actor, invitation.organization),
-               :ok <- revocable_invitation?(invitation) do
-            invitation
-            |> Ecto.Changeset.change(revoked_at: DateTime.utc_now())
-            |> Repo.update()
-          end
-      end
+  defp revoke_with_permission(invitation, actor) do
+    with :ok <- Bodyguard.permit(Policy, :invite_member, actor, invitation.organization),
+         :ok <- revocable_invitation?(invitation) do
+      invitation
+      |> Ecto.Changeset.change(revoked_at: DateTime.utc_now())
+      |> Repo.update()
     end
   end
 

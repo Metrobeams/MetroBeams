@@ -1,4 +1,8 @@
 defmodule Plataforma.Agents.Secret do
+  @moduledoc """
+  Cryptographic secret generation and verification for agent authentication.
+  """
+
   @secret_bytes 32
   @digest_bytes 32
 

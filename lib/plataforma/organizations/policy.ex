@@ -1,4 +1,8 @@
 defmodule Plataforma.Organizations.Policy do
+  @moduledoc """
+  Bodyguard policy for organization authorization rules.
+  """
+
   @behaviour Bodyguard.Policy
 
   alias Plataforma.Organizations.Membership

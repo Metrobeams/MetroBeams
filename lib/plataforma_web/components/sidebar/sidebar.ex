@@ -1,4 +1,8 @@
 defmodule PlataformaWeb.Sidebar do
+  @moduledoc """
+  Sidebar navigation component for the application layout.
+  """
+
   use PlataformaWeb, :html
 
   attr :current_path, :string, required: true

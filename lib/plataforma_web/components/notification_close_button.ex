@@ -1,4 +1,8 @@
 defmodule PlataformaWeb.NotificationCloseButton do
+  @moduledoc """
+  Close button component for dismissing notifications.
+  """
+
   use Phoenix.Component
 
   attr :notification_id, :string, required: true

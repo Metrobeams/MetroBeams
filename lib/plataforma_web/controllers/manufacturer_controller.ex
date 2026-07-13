@@ -98,29 +98,33 @@ defmodule PlataformaWeb.ManufacturerController do
             |> Plug.Conn.halt()
 
           {organization, membership} ->
-            case Bodyguard.permit(
-                   Plataforma.Organizations.Policy,
-                   :manage_manufacturers,
-                   membership,
-                   organization
-                 ) do
-              :ok ->
-                conn
-                |> Plug.Conn.assign(:organization, organization)
-                |> Plug.Conn.assign(:membership, membership)
-
-              {:error, :unauthorized} ->
-                conn
-                |> put_flash(:error, "Você não tem permissão para acessar esta funcionalidade.")
-                |> redirect(to: ~p"/")
-                |> Plug.Conn.halt()
-            end
+            permit_and_assign(conn, membership, organization)
         end
 
       _ ->
         conn
         |> put_flash(:error, "Faça login para continuar.")
         |> redirect(to: ~p"/users/log-in")
+        |> Plug.Conn.halt()
+    end
+  end
+
+  defp permit_and_assign(conn, membership, organization) do
+    case Bodyguard.permit(
+           Plataforma.Organizations.Policy,
+           :manage_manufacturers,
+           membership,
+           organization
+         ) do
+      :ok ->
+        conn
+        |> Plug.Conn.assign(:organization, organization)
+        |> Plug.Conn.assign(:membership, membership)
+
+      {:error, :unauthorized} ->
+        conn
+        |> put_flash(:error, "Você não tem permissão para acessar esta funcionalidade.")
+        |> redirect(to: ~p"/")
         |> Plug.Conn.halt()
     end
   end
