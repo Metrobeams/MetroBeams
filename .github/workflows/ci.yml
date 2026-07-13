@@ -65,6 +65,14 @@ jobs:
       - name: Compile with warnings as errors
         run: mix compile --warnings-as-errors
 
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes imagemagick
+          if ! command -v magick >/dev/null; then
+            sudo ln --symbolic "$(command -v convert)" /usr/local/bin/magick
+          fi
+
       - name: Run tests
         run: mix test
 
