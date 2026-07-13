@@ -1,0 +1,87 @@
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_path={@conn.request_path}
+  notification_summary={@notification_summary}
+  content_class="max-w-4xl"
+>
+  <div id="notifications-page" data-design-system="carbon">
+    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
+          Central
+        </p>
+        <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
+          Notificações
+        </h1>
+      </div>
+
+      <.form for={%{}} action={~p"/notifications/read-all"} method="patch">
+        <.button class="border border-[#0f62fe] bg-transparent px-4 py-2 text-sm font-semibold text-[#0f62fe] hover:bg-[#edf5ff] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]">
+          Marcar todas como lidas
+        </.button>
+      </.form>
+    </div>
+
+    <%= if Enum.empty?(@notification_page.notifications) do %>
+      <div
+        id="notifications-empty"
+        class="border border-[#e0e0e0] bg-white px-6 py-12 text-center dark:border-[#525252] dark:bg-[#262626]"
+      >
+        <.icon name="hero-bell" class="mx-auto size-8 text-[#8d8d8d]" />
+        <p class="mt-4 text-sm text-[#525252] dark:text-[#c6c6c6]">
+          Você não possui notificações.
+        </p>
+      </div>
+    <% else %>
+      <ul class="divide-y divide-[#e0e0e0] border border-[#e0e0e0] bg-white dark:divide-[#525252] dark:border-[#525252] dark:bg-[#262626]">
+        <li
+          :for={notification <- @notification_page.notifications}
+          id={"notification-#{notification.id}"}
+          class={[
+            "p-5",
+            is_nil(notification.read_at) &&
+              "border-l-4 border-l-[#{status_color(notification.status)}] bg-[#edf5ff] dark:bg-[#001d6c]"
+          ]}
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-3 min-w-0">
+              <div class="flex-shrink-0 mt-0.5">
+                <PlataformaWeb.NotificationIcons.status_icon status={notification.status || :info} />
+              </div>
+              <div class="min-w-0">
+                <h2 class={[
+                  "text-sm text-[#161616] dark:text-[#f4f4f4]",
+                  is_nil(notification.read_at) && "font-semibold"
+                ]}>
+                  {notification.title}
+                </h2>
+                <p class="mt-1 text-sm leading-6 text-[#525252] dark:text-[#c6c6c6]">
+                  {notification.body}
+                </p>
+                <time
+                  class="mt-2 block text-xs text-[#6f6f6f]"
+                  datetime={DateTime.to_iso8601(notification.inserted_at)}
+                >
+                  {Calendar.strftime(notification.inserted_at, "%d/%m/%Y %H:%M")}
+                </time>
+              </div>
+            </div>
+
+            <%= if is_nil(notification.read_at) do %>
+              <PlataformaWeb.NotificationCloseButton.close_button notification_id={notification.id} action={~p"/notifications/#{notification.id}/read"} />
+            <% end %>
+          </div>
+        </li>
+      </ul>
+
+      <.link
+        :if={@notification_page.next_before}
+        href={~p"/notifications?#{[before: @notification_page.next_before]}"}
+        class="mt-6 inline-flex text-sm font-semibold text-[#0f62fe] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]"
+      >
+        Carregar anteriores
+      </.link>
+    <% end %>
+  </div>
+</Layouts.app>
