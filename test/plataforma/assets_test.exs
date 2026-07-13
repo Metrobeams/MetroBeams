@@ -131,12 +131,78 @@ defmodule Plataforma.AssetsTest do
       assert category == Assets.get_category!(organization.id, category.id)
     end
 
-    test "delete_category/1 deactivates the category", %{organization: organization} do
+    test "delete_category/1 deactivates the category but preserves the record", %{
+      organization: organization
+    } do
       {:ok, category} = Assets.create_category(organization.id, %{name: "Notebooks"})
       assert {:ok, %AssetCategory{}} = Assets.delete_category(category)
 
+      # Record still exists but is inactive
       category = Assets.get_category!(organization.id, category.id)
       assert category.active == false
+
+      # Can recreate with same name after soft delete
+      assert {:ok, %AssetCategory{} = new_category} =
+               Assets.create_category(organization.id, %{name: "Notebooks"})
+
+      assert new_category.id != category.id
+    end
+
+    test "inactive categories do not appear in list_categories", %{organization: organization} do
+      {:ok, category} = Assets.create_category(organization.id, %{name: "Notebooks"})
+      {:ok, _} = Assets.create_category(organization.id, %{name: "Desktops"})
+
+      # Deactivate one category
+      {:ok, _} = Assets.delete_category(category)
+
+      categories = Assets.list_categories(organization.id)
+      assert length(categories) == 1
+      assert hd(categories).name == "Desktops"
+    end
+
+    test "create_category/2 ignores organization_id from client", %{organization: organization} do
+      # Try to inject a different organization_id
+      other_org_id = Ecto.UUID.generate()
+
+      {:ok, category} =
+        Assets.create_category(organization.id, %{
+          name: "Notebooks",
+          organization_id: other_org_id
+        })
+
+      # Should use the provided organization_id, not the injected one
+      assert category.organization_id == organization.id
+    end
+
+    test "create_category/2 ignores active field from client", %{organization: organization} do
+      {:ok, category} =
+        Assets.create_category(organization.id, %{
+          name: "Notebooks",
+          active: false
+        })
+
+      # Should default to active: true regardless of input
+      assert category.active == true
+    end
+
+    test "get_category!/2 raises for invalid UUID", %{organization: organization} do
+      assert_raise Ecto.Query.CastError, fn ->
+        Assets.get_category!(organization.id, "invalid-uuid")
+      end
+    end
+
+    test "get_category!/2 raises for nil UUID", %{organization: organization} do
+      assert_raise ArgumentError, fn ->
+        Assets.get_category!(organization.id, nil)
+      end
+    end
+
+    test "get_category!/2 raises for non-existent UUID", %{organization: organization} do
+      fake_uuid = Ecto.UUID.generate()
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Assets.get_category!(organization.id, fake_uuid)
+      end
     end
 
     test "change_category/1 returns a category changeset", %{organization: organization} do
