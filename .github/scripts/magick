@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ "$1" = "identify" ]; then
+  shift
+  exec identify "$@"
+fi
+
+exec convert "$@"
