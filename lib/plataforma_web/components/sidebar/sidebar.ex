@@ -39,28 +39,28 @@ defmodule PlataformaWeb.Sidebar do
         <.sidebar_link
           id="sidebar-home-link"
           href={~p"/"}
-          icon="hero-home"
+          icon="hero-home-modern"
           label="Início"
           active={@current_path == "/"}
         />
         <.sidebar_link
           id="sidebar-assets-link"
           href={~p"/asset-categories"}
-          icon="hero-tag"
+          icon="hero-hashtag"
           label="Categorias"
           active={String.starts_with?(@current_path, "/asset-categories")}
         />
         <.sidebar_link
           id="sidebar-manufacturers-link"
           href={~p"/manufacturers"}
-          icon="hero-building-office"
+          icon="hero-building-office-2"
           label="Fabricantes"
           active={String.starts_with?(@current_path, "/manufacturers")}
         />
         <.sidebar_link
           id="sidebar-settings-link"
           href={~p"/users/settings"}
-          icon="hero-cog-6-tooth"
+          icon="hero-cog-8-tooth"
           label="Configurações"
           active={String.starts_with?(@current_path, "/users/settings")}
         />
