@@ -82,6 +82,8 @@ defmodule PlataformaWeb.Router do
     put "/users/settings/avatar", UserSettingsController, :update_avatar
     delete "/users/settings/avatar", UserSettingsController, :delete_avatar
     get "/users/settings/confirm-email/:token", UserSettingsController, :confirm_email
+
+    resources "/asset-categories", AssetCategoryController
   end
 
   scope "/", PlataformaWeb do
