@@ -1,9 +1,21 @@
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 const ToastHook = {
   mounted() {
     window.__toastHook = this;
     this.toasts = [];
     this.maxVisible = 3;
     this.autoDismissMs = 5000;
+    this.timeouts = {};
+  },
+
+  destroyed() {
+    Object.values(this.timeouts).forEach(clearTimeout);
+    this.timeouts = {};
   },
 
   addToast(id, status, title, body) {
@@ -25,8 +37,8 @@ const ToastHook = {
           </svg>
         </div>
         <div class="toast-content">
-          <p class="toast-title">${toast.title}</p>
-          ${toast.body ? `<p class="toast-body">${toast.body}</p>` : ''}
+          <p class="toast-title">${escapeHtml(toast.title)}</p>
+          ${toast.body ? `<p class="toast-body">${escapeHtml(toast.body)}</p>` : ''}
         </div>
         <button class="toast-close" aria-label="Fechar" onclick="window.__toastHook.removeToast('${toast.id}')">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16">
@@ -38,6 +50,10 @@ const ToastHook = {
   },
 
   removeToast(id) {
+    if (this.timeouts[id]) {
+      clearTimeout(this.timeouts[id]);
+      delete this.timeouts[id];
+    }
     const element = document.getElementById(`toast-${id}`);
     if (element) {
       element.classList.add('toast-exit');
@@ -49,7 +65,7 @@ const ToastHook = {
   },
 
   scheduleDismiss(id) {
-    setTimeout(() => this.removeToast(id), this.autoDismissMs);
+    this.timeouts[id] = setTimeout(() => this.removeToast(id), this.autoDismissMs);
   },
 
   getStatusColor(status) {
