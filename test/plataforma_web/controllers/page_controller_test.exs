@@ -38,6 +38,24 @@ defmodule PlataformaWeb.PageControllerTest do
     refute LazyHTML.text(topbar_user) =~ user.email
   end
 
+  test "GET / renders accessible controls for the responsive sidebar", %{conn: conn} do
+    user = user_fixture()
+
+    document =
+      conn
+      |> log_in_user(user)
+      |> get(~p"/")
+      |> html_response(200)
+      |> LazyHTML.from_document()
+
+    assert_element(document, "#carbon-sidebar #sidebar-toggle")
+
+    assert_element(
+      document,
+      "#sidebar-collapse-toggle[data-sidebar-collapse][aria-controls='app-sidebar'][aria-expanded='true']"
+    )
+  end
+
   test "GET / lists only organizations accessible to the signed-in user", %{conn: conn} do
     user = user_fixture()
     other_user = user_fixture()

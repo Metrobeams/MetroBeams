@@ -16,3 +16,14 @@ Ready to run in production? Please [check our deployment guides](https://phoenix
 * Docs: https://phoenix.hexdocs.pm
 * Forum: https://elixirforum.com/c/phoenix-forum
 * Source: https://github.com/phoenixframework/phoenix
+
+## License
+
+Copyright (C) 2026 Plataforma contributors.
+
+This project is licensed under the
+[GNU Affero General Public License v3.0 only](LICENSE), identified by SPDX as
+`AGPL-3.0-only`.
+
+Third-party materials remain under their respective licenses. See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

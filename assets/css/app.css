@@ -184,6 +184,7 @@
 /* IBM Carbon sidebar layout */
 #carbon-sidebar {
   --carbon-sidebar-width: 200px;
+  --carbon-sidebar-collapsed-width: 48px;
   --carbon-sidebar-bg: #161616;
   --carbon-sidebar-hover: #393939;
   --carbon-sidebar-active: #262626;
@@ -200,6 +201,27 @@
   color: var(--carbon-sidebar-text);
   flex-shrink: 0;
   height: 100%;
+  overflow: hidden;
+  transition: width 0.2s, transform 0.2s;
+}
+
+#carbon-sidebar .sidebar-label {
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+#carbon-sidebar .sidebar-collapse-control {
+  color: var(--carbon-sidebar-text);
+}
+
+#carbon-sidebar .sidebar-collapse-control:hover {
+  background: var(--carbon-sidebar-hover);
+  color: var(--carbon-sidebar-text-active);
+}
+
+#carbon-sidebar .sidebar-collapse-control:focus-visible {
+  outline: 2px solid var(--carbon-blue-60);
+  outline-offset: -2px;
 }
 
 #carbon-sidebar aside a {
@@ -278,7 +300,6 @@
   left: 0;
   z-index: 40;
   transform: translateX(-100%);
-  transition: transform 0.2s;
 }
 
 #carbon-sidebar .sidebar-toggle:checked ~ aside {
@@ -296,6 +317,39 @@
     height: 100vh;
     transform: none;
     flex-shrink: 0;
+  }
+
+  #carbon-sidebar[data-sidebar-collapsed="true"] aside {
+    width: var(--carbon-sidebar-collapsed-width);
+  }
+
+  #carbon-sidebar[data-sidebar-collapsed="true"] .sidebar-brand {
+    justify-content: center;
+    padding-inline: 0.5rem;
+  }
+
+  #carbon-sidebar[data-sidebar-collapsed="true"] .sidebar-brand-link {
+    display: none;
+  }
+
+  #carbon-sidebar[data-sidebar-collapsed="true"] .sidebar-navigation {
+    padding-inline: 0.25rem;
+  }
+
+  #carbon-sidebar[data-sidebar-collapsed="true"] .sidebar-link {
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+  }
+
+  #carbon-sidebar[data-sidebar-collapsed="true"] .sidebar-label {
+    width: 0;
+    overflow: hidden;
+    opacity: 0;
+  }
+
+  #carbon-sidebar[data-sidebar-collapsed="true"] [data-sidebar-collapse-icon] {
+    transform: rotate(180deg);
   }
 
   #carbon-sidebar .sidebar-backdrop {

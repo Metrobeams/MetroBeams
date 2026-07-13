@@ -7,6 +7,7 @@ defmodule PlataformaWeb.Layouts do
 
   alias PlataformaWeb.NotificationIcons
   alias PlataformaWeb.NotificationCloseButton
+  alias PlataformaWeb.Sidebar
 
   # Embed all files in layouts/* within this module.
   # The default root.html.heex file contains the HTML
@@ -54,11 +55,10 @@ defmodule PlataformaWeb.Layouts do
     ~H"""
     <%= if @current_scope do %>
       <div id="carbon-shell">
-        <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle peer sr-only" />
-        <label for="sidebar-toggle" class="sidebar-backdrop" />
-
-        <div id="carbon-sidebar" class={["flex"]}>
-          <.sidebar current_scope={@current_scope} current_path={@current_path} />
+        <div id="carbon-sidebar" class={["flex"]} data-sidebar-collapsed="false">
+          <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle peer sr-only" />
+          <label for="sidebar-toggle" class="sidebar-backdrop" aria-label="Fechar menu lateral" />
+          <Sidebar.sidebar current_path={@current_path} />
           <div class={["flex-1 min-w-0 flex flex-col"]}>
             <.app_header
               current_scope={@current_scope}
@@ -354,57 +354,6 @@ defmodule PlataformaWeb.Layouts do
     do: @status_border_colors[status] || "border-l-[#0f62fe]"
 
   defp notification_status_border(_), do: "border-l-[#0f62fe]"
-
-  attr :current_scope, :map, required: true
-  attr :current_path, :string, required: true
-
-  defp sidebar(assigns) do
-    ~H"""
-    <aside class="flex flex-col">
-      <div class="px-4 py-4">
-        <.link href={~p"/"} class="flex items-center gap-2">
-          <span class="grid size-8 place-items-center bg-[#0f62fe] text-white">
-            <.icon name="hero-building-office-2" class="size-4" />
-          </span>
-          <span class="text-sm font-semibold text-white">Plataforma</span>
-        </.link>
-      </div>
-
-      <nav class="flex-1 px-3">
-        <.sidebar_link href={~p"/"} icon="hero-home" label="Início" active={@current_path == "/"} />
-        <.sidebar_link
-          href={~p"/users/settings"}
-          icon="hero-cog-6-tooth"
-          label="Configurações"
-          active={String.starts_with?(@current_path, "/users/settings")}
-        />
-      </nav>
-    </aside>
-    """
-  end
-
-  attr :href, :string, required: true
-  attr :icon, :string, required: true
-  attr :label, :string, required: true
-  attr :method, :string, default: nil
-  attr :active, :boolean, default: false
-
-  defp sidebar_link(assigns) do
-    ~H"""
-    <.link
-      navigate={@href}
-      method={@method}
-      class={[
-        "flex items-center gap-3 px-3 py-2.5 text-sm",
-        "hover:bg-[#393939] hover:text-white",
-        @active && "bg-[#262626] text-white shadow-[inset_3px_0_0_#0f62fe]"
-      ]}
-    >
-      <.icon name={@icon} class="size-5 shrink-0" />
-      <span>{@label}</span>
-    </.link>
-    """
-  end
 
   @doc """
   Shows the flash group with standard titles and content.

@@ -130,6 +130,45 @@ const setupNotificationsMenu = () => {
 document.addEventListener("DOMContentLoaded", setupNotificationsMenu)
 window.addEventListener("phx:page-loading-stop", setupNotificationsMenu)
 
+const setupSidebarCollapse = () => {
+  const sidebar = document.getElementById("carbon-sidebar")
+  const toggle = sidebar?.querySelector("[data-sidebar-collapse]")
+  if (!sidebar || !toggle || toggle.dataset.sidebarCollapseBound === "true") return
+
+  toggle.dataset.sidebarCollapseBound = "true"
+  const storageKey = "plataforma:sidebar-collapsed"
+
+  const applyState = collapsed => {
+    sidebar.dataset.sidebarCollapsed = String(collapsed)
+    toggle.setAttribute("aria-expanded", String(!collapsed))
+    toggle.setAttribute("aria-label", collapsed ? "Expandir menu lateral" : "Recolher menu lateral")
+  }
+
+  let collapsed = false
+
+  try {
+    collapsed = window.localStorage.getItem(storageKey) === "true"
+  } catch (_error) {
+    collapsed = false
+  }
+
+  applyState(collapsed)
+
+  toggle.addEventListener("click", () => {
+    const nextCollapsed = sidebar.dataset.sidebarCollapsed !== "true"
+    applyState(nextCollapsed)
+
+    try {
+      window.localStorage.setItem(storageKey, String(nextCollapsed))
+    } catch (_error) {
+      // The sidebar still works when browser storage is unavailable.
+    }
+  })
+}
+
+document.addEventListener("DOMContentLoaded", setupSidebarCollapse)
+window.addEventListener("phx:page-loading-stop", setupSidebarCollapse)
+
 // The lines below enable quality of life phoenix_live_reload
 // development features:
 //
