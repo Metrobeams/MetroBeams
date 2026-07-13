@@ -1,0 +1,461 @@
+<Layouts.app
+  flash={@flash}
+  current_scope={if @reauth, do: nil, else: @current_scope}
+  content_class="max-w-7xl"
+  main_class="login-main px-8 py-4"
+>
+  <% sent? = @conn.query_params["sent"] == "true" %>
+  <% sent_email = @conn.query_params["email"] || "" %>
+
+  <section
+    id="login-page"
+    data-layout="desktop"
+    data-surface="flat"
+    data-sizing="intrinsic"
+    data-design-system="carbon"
+  >
+    <div class={[
+      "grid lg:grid-cols-[minmax(22rem,0.85fr)_minmax(32rem,1.15fr)]"
+    ]}>
+      <%!-- Left panel — hidden on mobile --%>
+      <div class={[
+        "hidden flex-col justify-between bg-base-content px-10 py-10 text-base-100 lg:flex xl:px-14"
+      ]}>
+        <div>
+          <.link
+            navigate={~p"/"}
+            id="login-home-link"
+            class={[
+              "group inline-flex items-center gap-2 text-xs font-semibold text-base-100/80 transition-colors",
+              "hover:text-base-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-base-100"
+            ]}
+          >
+            <.icon
+              name="hero-arrow-left"
+              class={["size-3.5 transition-transform group-hover:-translate-x-1"]}
+            /> Voltar ao início
+          </.link>
+
+          <p class={["mt-10 text-xs font-semibold uppercase tracking-[0.22em] text-base-100/60"]}>
+            Plataforma
+          </p>
+          <h1 class={["mt-3 text-2xl font-bold tracking-tight sm:text-3xl"]}>
+            Que bom ter você de volta.
+          </h1>
+          <p class={["mt-4 max-w-sm text-sm leading-6 text-base-100/70"]}>
+            Acesse sua conta para continuar gerenciando seus projetos com simplicidade e segurança.
+          </p>
+        </div>
+
+        <div class={["mt-10 flex items-center gap-3 text-xs text-base-100/60"]}>
+          <span class={[
+            "flex size-7 shrink-0 items-center justify-center rounded-full border border-base-100/20"
+          ]}>
+            <.icon name="hero-shield-check" class={["size-3.5"]} />
+          </span>
+          <span>Acesso protegido e seguro.</span>
+        </div>
+      </div>
+
+      <%!-- Right panel — authentication forms --%>
+      <div class={["flex items-center px-8 py-8 lg:px-12 xl:px-16"]}>
+        <div class={["mx-auto w-full max-w-xl"]}>
+          <div>
+            <p class={["text-xs font-semibold text-base-content/60"]}>
+              <%= if @reauth || @current_scope do %>
+                Confirme sua identidade
+              <% else %>
+                Acesse sua conta
+              <% end %>
+            </p>
+            <h2 class={["mt-1.5 text-2xl font-bold tracking-tight text-base-content"]}>
+              <%= if @reauth do %>
+                Confirme sua senha
+              <% else %>
+                Entrar
+              <% end %>
+            </h2>
+            <p class={["mt-2 text-xs leading-5 text-base-content/60"]}>
+              <%= if @reauth do %>
+                Por segurança, confirme sua senha para acessar as configurações. Sua sessão continua ativa.
+              <% else %>
+                <%= if @current_scope do %>
+                  Para sua segurança, autentique-se novamente antes de realizar esta ação.
+                <% else %>
+                  Acesse sua conta para continuar.
+                <% end %>
+              <% end %>
+            </p>
+          </div>
+
+          <%= cond do %>
+            <% @reauth -> %>
+              <%!-- Reauthentication: password only --%>
+              <div id="reauth-panel" class={["mt-6"]}>
+                <.form
+                  for={@form}
+                  as={:user}
+                  id="reauth_form"
+                  action={~p"/users/log-in?reauth=true"}
+                  class={["space-y-4"]}
+                >
+                  <.input
+                    readonly={true}
+                    field={@form[:email]}
+                    type="email"
+                    label="E-mail"
+                    autocomplete="username"
+                    spellcheck="false"
+                    class={[
+                      "w-full rounded-lg border border-base-300 bg-base-200/60 px-3 py-2 text-xs text-base-content shadow-sm outline-none",
+                      "cursor-not-allowed"
+                    ]}
+                  />
+
+                  <div class={["relative"]}>
+                    <.input
+                      field={@form[:password]}
+                      type="password"
+                      id="reauth_password"
+                      label="Senha"
+                      autocomplete="current-password"
+                      spellcheck="false"
+                      required
+                      class={[
+                        "w-full rounded-lg border border-base-300 bg-base-100 px-3 py-2 pr-10 text-xs text-base-content shadow-sm outline-none transition",
+                        "placeholder:text-base-content/35 focus:border-base-content focus:ring-2 focus:ring-base-content/10"
+                      ]}
+                      error_class="border-error focus:border-error focus:ring-error/10"
+                    />
+                    <button
+                      type="button"
+                      id="toggle-reauth-password"
+                      class={[
+                        "absolute right-2 top-[30px] cursor-pointer rounded-md p-1 text-base-content/40 transition-colors",
+                        "hover:bg-base-200 hover:text-base-content/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content"
+                      ]}
+                      aria-label="Mostrar senha"
+                    >
+                      <.icon name="hero-eye" class={["size-4"]} />
+                      <.icon name="hero-eye-slash" class={["size-4 hidden"]} />
+                    </button>
+                  </div>
+
+                  <.button
+                    id="reauth-submit"
+                    phx-disable-with="Confirmando..."
+                    class={[
+                      "group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-base-content px-4 py-2.5",
+                      "text-xs font-semibold text-base-100 shadow-md shadow-base-content/15 transition duration-200",
+                      "hover:-translate-y-0.5 hover:bg-base-content/90 hover:shadow-lg",
+                      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content disabled:cursor-wait disabled:opacity-70"
+                    ]}
+                  >
+                    Confirmar
+                    <.icon
+                      name="hero-arrow-right"
+                      class={["size-3.5 transition-transform group-hover:translate-x-1"]}
+                    />
+                  </.button>
+                </.form>
+
+                <p class={["mt-5 text-center text-xs text-base-content/60"]}>
+                  <.link
+                    navigate={~p"/"}
+                    class={[
+                      "font-semibold text-base-content underline decoration-base-content/25 underline-offset-4 transition",
+                      "hover:decoration-base-content focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-base-content"
+                    ]}
+                  >
+                    Voltar ao início
+                  </.link>
+                </p>
+              </div>
+            <% sent? -> %>
+              <%!-- Confirmation state after magic link sent --%>
+              <div id="login-sent-panel" class={["mt-6 space-y-4"]}>
+                <div class={[
+                  "flex items-center gap-2.5 rounded-lg border border-success/25 bg-success/10 p-3"
+                ]}>
+                  <.icon name="hero-check-circle" class={["size-4 shrink-0 text-success"]} />
+                  <p class={["text-xs text-base-content"]}>
+                    Enviamos um link de acesso para <strong>{sent_email}</strong>.
+                  </p>
+                </div>
+
+                <p class={["text-xs text-base-content/60"]}>
+                  Verifique sua caixa de entrada e clique no link para acessar. O link expira em 15 minutos.
+                </p>
+
+                <div class={["space-y-2.5"]}>
+                  <.form
+                    for={@form}
+                    as={:user}
+                    id="login-resend-form"
+                    action={~p"/users/log-in"}
+                  >
+                    <input type="hidden" name="user[email]" value={sent_email} />
+                    <.button
+                      id="login-resend-submit"
+                      phx-disable-with="Reenviando..."
+                      class={[
+                        "group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-base-content px-4 py-2.5",
+                        "text-xs font-semibold text-base-100 shadow-md shadow-base-content/15 transition duration-200",
+                        "hover:-translate-y-0.5 hover:bg-base-content/90 hover:shadow-lg",
+                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content disabled:cursor-wait disabled:opacity-70"
+                      ]}
+                    >
+                      Reenviar link
+                      <.icon
+                        name="hero-arrow-path"
+                        class={["size-3.5 transition-transform group-hover:rotate-180"]}
+                      />
+                    </.button>
+                  </.form>
+
+                  <.link
+                    navigate={~p"/users/log-in"}
+                    id="login-change-email-link"
+                    class={[
+                      "block text-center text-xs font-semibold text-base-content/60 underline decoration-base-content/20 underline-offset-4 transition",
+                      "hover:decoration-base-content/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-base-content"
+                    ]}
+                  >
+                    Alterar e-mail
+                  </.link>
+                </div>
+              </div>
+            <% true -> %>
+              <%!-- Normal login state with tabs --%>
+              <div id="login-tabs" data-panel-sizing="matched" class={["mt-6"]}>
+                <div class={[
+                  "flex gap-0.5 rounded-lg bg-base-200 p-0.5"
+                ]}>
+                  <button
+                    type="button"
+                    data-tab="magic"
+                    id="tab-magic"
+                    class={[
+                      "flex-1 cursor-pointer rounded-md px-3 py-2 text-xs font-semibold transition-all duration-200",
+                      "bg-base-content text-base-100 shadow-sm"
+                    ]}
+                  >
+                    Link por e-mail
+                  </button>
+                  <button
+                    type="button"
+                    data-tab="password"
+                    id="tab-password"
+                    class={[
+                      "flex-1 cursor-pointer rounded-md px-3 py-2 text-xs font-semibold transition-all duration-200",
+                      "text-base-content/60 hover:text-base-content"
+                    ]}
+                  >
+                    Usar senha
+                  </button>
+                </div>
+
+                <%!-- Magic link panel --%>
+                <div id="panel-magic" class={["mt-5"]}>
+                  <.form
+                    for={@form}
+                    as={:user}
+                    id="login_form_magic"
+                    action={~p"/users/log-in"}
+                    class={["space-y-4"]}
+                  >
+                    <.input
+                      readonly={!!@current_scope}
+                      field={@form[:email]}
+                      type="email"
+                      label="E-mail"
+                      autocomplete="username"
+                      spellcheck="false"
+                      placeholder="voce@exemplo.com"
+                      required
+                      class={[
+                        "w-full rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-xs text-base-content shadow-sm outline-none transition",
+                        "placeholder:text-base-content/35 focus:border-base-content focus:ring-2 focus:ring-base-content/10",
+                        "read-only:cursor-not-allowed read-only:bg-base-200/60"
+                      ]}
+                      error_class="border-error focus:border-error focus:ring-error/10"
+                    />
+                    <.button
+                      id="login-magic-submit"
+                      phx-disable-with="Enviando link..."
+                      class={[
+                        "group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-base-content px-4 py-2.5",
+                        "text-xs font-semibold text-base-100 shadow-md shadow-base-content/15 transition duration-200",
+                        "hover:-translate-y-0.5 hover:bg-base-content/90 hover:shadow-lg",
+                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content disabled:cursor-wait disabled:opacity-70"
+                      ]}
+                    >
+                      Enviar link de acesso
+                      <.icon
+                        name="hero-paper-airplane"
+                        class={["size-3.5 transition-transform group-hover:translate-x-1"]}
+                      />
+                    </.button>
+                  </.form>
+                </div>
+
+                <%!-- Password panel --%>
+                <div id="panel-password" class={["mt-5 hidden"]}>
+                  <.form
+                    for={@form}
+                    as={:user}
+                    id="login_form_password"
+                    action={~p"/users/log-in"}
+                    class={["space-y-4"]}
+                  >
+                    <.input
+                      readonly={!!@current_scope}
+                      field={@form[:email]}
+                      type="email"
+                      label="E-mail"
+                      autocomplete="username"
+                      spellcheck="false"
+                      placeholder="voce@exemplo.com"
+                      required
+                      class={[
+                        "w-full rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-xs text-base-content shadow-sm outline-none transition",
+                        "placeholder:text-base-content/35 focus:border-base-content focus:ring-2 focus:ring-base-content/10",
+                        "read-only:cursor-not-allowed read-only:bg-base-200/60"
+                      ]}
+                      error_class="border-error focus:border-error focus:ring-error/10"
+                    />
+
+                    <div class={["relative"]}>
+                      <.input
+                        field={@form[:password]}
+                        type="password"
+                        id="user_password"
+                        label="Senha"
+                        autocomplete="current-password"
+                        spellcheck="false"
+                        class={[
+                          "w-full rounded-lg border border-base-300 bg-base-100 px-3 py-2 pr-10 text-xs text-base-content shadow-sm outline-none transition",
+                          "placeholder:text-base-content/35 focus:border-base-content focus:ring-2 focus:ring-base-content/10"
+                        ]}
+                        error_class="border-error focus:border-error focus:ring-error/10"
+                      />
+                      <button
+                        type="button"
+                        id="toggle-password"
+                        class={[
+                          "absolute right-2 top-[30px] cursor-pointer rounded-md p-1 text-base-content/40 transition-colors",
+                          "hover:bg-base-200 hover:text-base-content/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content"
+                        ]}
+                        aria-label="Mostrar senha"
+                      >
+                        <.icon name="hero-eye" class={["size-4"]} />
+                        <.icon name="hero-eye-slash" class={["size-4 hidden"]} />
+                      </button>
+                    </div>
+
+                    <.link
+                      navigate="#"
+                      id="login-forgot-password-link"
+                      class={[
+                        "text-xs font-semibold text-base-content/60 underline decoration-base-content/20 underline-offset-4 transition",
+                        "hover:decoration-base-content/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-base-content"
+                      ]}
+                    >
+                      Esqueci minha senha
+                    </.link>
+
+                    <.input
+                      field={@form[:remember_me]}
+                      type="checkbox"
+                      label="Manter minha sessão conectada"
+                      id="user_remember_me"
+                    />
+
+                    <.button
+                      id="login-password-submit"
+                      phx-disable-with="Entrando..."
+                      class={[
+                        "group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-base-content px-4 py-2.5",
+                        "text-xs font-semibold text-base-100 shadow-md shadow-base-content/15 transition duration-200",
+                        "hover:-translate-y-0.5 hover:bg-base-content/90 hover:shadow-lg",
+                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content disabled:cursor-wait disabled:opacity-70"
+                      ]}
+                    >
+                      Entrar
+                      <.icon
+                        name="hero-arrow-right"
+                        class={["size-3.5 transition-transform group-hover:translate-x-1"]}
+                      />
+                    </.button>
+                  </.form>
+                </div>
+              </div>
+          <% end %>
+
+          <p
+            :if={!@reauth && !@current_scope}
+            class={["mt-5 text-center text-xs text-base-content/60"]}
+          >
+            Ainda não possui uma conta?
+            <.link
+              navigate={~p"/users/register"}
+              id="login-registration-link"
+              class={[
+                "font-semibold text-base-content underline decoration-base-content/25 underline-offset-4 transition",
+                "hover:decoration-base-content focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-base-content"
+              ]}
+            >
+              Criar conta
+            </.link>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var tabs = document.querySelectorAll("[data-tab]");
+      var panelMagic = document.getElementById("panel-magic");
+      var panelPassword = document.getElementById("panel-password");
+
+      tabs.forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          var tab = btn.getAttribute("data-tab");
+          panelMagic.classList.toggle("hidden", tab !== "magic");
+          panelPassword.classList.toggle("hidden", tab !== "password");
+
+          tabs.forEach(function(b) {
+            var isActive = b.getAttribute("data-tab") === tab;
+            b.classList.toggle("bg-base-content", isActive);
+            b.classList.toggle("text-base-100", isActive);
+            b.classList.toggle("shadow-sm", isActive);
+            b.classList.toggle("text-base-content/60", !isActive);
+          });
+        });
+      });
+
+      function setupPasswordToggle(buttonId, inputId) {
+        var btn = document.getElementById(buttonId);
+        if (btn) {
+          btn.addEventListener("click", function() {
+            var input = document.getElementById(inputId);
+            var icons = btn.querySelectorAll("span");
+            if (input.type === "password") {
+              input.type = "text";
+              if (icons[0]) icons[0].classList.add("hidden");
+              if (icons[1]) icons[1].classList.remove("hidden");
+            } else {
+              input.type = "password";
+              if (icons[0]) icons[0].classList.remove("hidden");
+              if (icons[1]) icons[1].classList.add("hidden");
+            }
+          });
+        }
+      }
+
+      setupPasswordToggle("toggle-password", "user_password");
+      setupPasswordToggle("toggle-reauth-password", "reauth_password");
+    });
+  </script>
+</Layouts.app>

@@ -324,13 +324,9 @@
   letter-spacing: 0;
 }
 
-#user-home[data-design-system="carbon"] main > section:first-child {
+#user-home[data-design-system="carbon"] #user-home-welcome {
   border-radius: 0;
-  background: var(--carbon-gray-100);
-}
-
-#user-home[data-design-system="carbon"] main > section:first-child > div {
-  border-top: 3px solid var(--carbon-blue-60);
+  background: var(--carbon-blue-60);
 }
 
 #user-home[data-design-system="carbon"] article:not([data-organization-card]) {

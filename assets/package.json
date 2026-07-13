@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "dependencies": {
+    "@ibm/plex": "6.4.1"
+  }
+}

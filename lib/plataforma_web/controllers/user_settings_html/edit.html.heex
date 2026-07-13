@@ -1,0 +1,202 @@
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_path={@conn.request_path}
+  notification_summary={@notification_summary}
+>
+  <div id="settings-page" data-design-system="carbon" class={["mx-auto max-w-2xl"]}>
+    <div class={["mb-10"]}>
+      <p class={["text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]"]}>
+        Configurações
+      </p>
+      <h1 class={["mt-2 text-3xl font-light tracking-tight text-[#161616]"]}>
+        Conta
+      </h1>
+      <p class={["mt-2 text-sm leading-6 text-[#525252]"]}>
+        Gerencie seu endereço de e-mail e configurações de senha.
+      </p>
+    </div>
+
+    <section
+      id="avatar-settings"
+      class={[
+        "rounded-none border border-[#e0e0e0] bg-white p-6"
+      ]}
+    >
+      <h2 class={["text-lg font-light text-[#161616]"]}>Avatar</h2>
+      <p id="avatar-help" class={["mt-1 text-xs leading-5 text-[#6f6f6f]"]}>
+        Envie uma imagem JPEG, PNG ou WebP de até 5 MB. A imagem será recortada em formato quadrado.
+      </p>
+
+      <div class={["mt-6 flex flex-col gap-6 sm:flex-row sm:items-start"]}>
+        <img
+          id="avatar-preview"
+          src={@avatar_url}
+          alt="Avatar atual"
+          class={[
+            "size-32 shrink-0 rounded-full border border-[#c6c6c6] bg-[#f4f4f4] object-cover"
+          ]}
+        />
+
+        <div class={["min-w-0 flex-1"]}>
+          <.form
+            for={%{}}
+            action={~p"/users/settings/avatar"}
+            method="put"
+            multipart
+            id="avatar-upload-form"
+            data-avatar-form
+            class={["space-y-4"]}
+          >
+            <div>
+              <label for="avatar-input" class={["block text-sm font-semibold text-[#161616]"]}>
+                Nova imagem
+              </label>
+              <input
+                id="avatar-input"
+                name="avatar"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                aria-describedby="avatar-help avatar-client-error"
+                required
+                class={[
+                  "mt-2 block w-full cursor-pointer border-0 border-b border-[#8d8d8d] bg-[#f4f4f4] text-sm text-[#161616]",
+                  "file:mr-4 file:border-0 file:bg-[#393939] file:px-4 file:py-3 file:text-sm file:font-semibold file:text-white",
+                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]"
+                ]}
+              />
+              <p
+                id="avatar-client-error"
+                class={["mt-2 hidden text-xs text-[#da1e28]"]}
+                role="alert"
+              >
+              </p>
+            </div>
+
+            <.button
+              id="avatar-submit"
+              data-loading-label="Enviando..."
+              class={[
+                "inline-flex cursor-pointer items-center justify-center border-0 bg-[#0f62fe] px-5 py-3 text-sm font-semibold text-white",
+                "hover:bg-[#0043ce] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]",
+                "disabled:cursor-not-allowed disabled:bg-[#8d8d8d]"
+              ]}
+            >
+              Enviar avatar
+            </.button>
+          </.form>
+
+          <%= if @current_scope.user.avatar_key do %>
+            <.form for={%{}} action={~p"/users/settings/avatar"} method="delete" class={["mt-3"]}>
+              <.button
+                id="avatar-remove"
+                class={[
+                  "inline-flex cursor-pointer items-center justify-center border border-[#da1e28] bg-transparent px-5 py-3 text-sm font-semibold text-[#da1e28]",
+                  "hover:bg-[#fff1f1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#da1e28]"
+                ]}
+              >
+                Remover avatar
+              </.button>
+            </.form>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <section class={["mt-6 rounded-none border border-[#e0e0e0] bg-white p-6"]}>
+      <h2 class={["text-lg font-light text-[#161616]"]}>
+        E-mail
+      </h2>
+      <p class={["mt-1 text-xs text-[#6f6f6f]"]}>
+        Altere o endereço de e-mail associado à sua conta.
+      </p>
+
+      <.form
+        :let={f}
+        for={@email_changeset}
+        action={~p"/users/settings"}
+        id="update_email"
+        class={["mt-6"]}
+      >
+        <input type="hidden" name="action" value="update_email" />
+
+        <.input
+          field={f[:email]}
+          type="email"
+          label="E-mail"
+          autocomplete="username"
+          spellcheck="false"
+          required
+          class={[
+            "w-full border-0 border-b border-b-[#8d8d8d] bg-transparent px-0 py-3 text-sm text-[#161616] outline-none",
+            "placeholder:text-[#a8a8a8] focus:border-b-[#0f62fe] focus:ring-0"
+          ]}
+        />
+
+        <.button
+          phx-disable-with="Alterando..."
+          class={[
+            "mt-6 inline-flex cursor-pointer items-center justify-center border-0 bg-[#0f62fe] px-5 py-3 text-sm font-semibold text-white",
+            "transition-colors hover:bg-[#0043ce] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]"
+          ]}
+        >
+          Alterar e-mail
+        </.button>
+      </.form>
+    </section>
+
+    <section class={["mt-6 rounded-none border border-[#e0e0e0] bg-white p-6"]}>
+      <h2 class={["text-lg font-light text-[#161616]"]}>
+        Senha
+      </h2>
+      <p class={["mt-1 text-xs text-[#6f6f6f]"]}>
+        Atualize sua senha para manter sua conta segura.
+      </p>
+
+      <.form
+        :let={f}
+        for={@password_changeset}
+        action={~p"/users/settings"}
+        id="update_password"
+        class={["mt-6 space-y-4"]}
+      >
+        <input type="hidden" name="action" value="update_password" />
+
+        <.input
+          field={f[:password]}
+          type="password"
+          label="Nova senha"
+          autocomplete="new-password"
+          spellcheck="false"
+          required
+          class={[
+            "w-full border-0 border-b border-b-[#8d8d8d] bg-transparent px-0 py-3 text-sm text-[#161616] outline-none",
+            "placeholder:text-[#a8a8a8] focus:border-b-[#0f62fe] focus:ring-0"
+          ]}
+        />
+        <.input
+          field={f[:password_confirmation]}
+          type="password"
+          label="Confirmar nova senha"
+          autocomplete="new-password"
+          spellcheck="false"
+          required
+          class={[
+            "w-full border-0 border-b border-b-[#8d8d8d] bg-transparent px-0 py-3 text-sm text-[#161616] outline-none",
+            "placeholder:text-[#a8a8a8] focus:border-b-[#0f62fe] focus:ring-0"
+          ]}
+        />
+
+        <.button
+          phx-disable-with="Salvando..."
+          class={[
+            "mt-2 inline-flex cursor-pointer items-center justify-center border-0 bg-[#0f62fe] px-5 py-3 text-sm font-semibold text-white",
+            "transition-colors hover:bg-[#0043ce] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]"
+          ]}
+        >
+          Salvar senha
+        </.button>
+      </.form>
+    </section>
+  </div>
+</Layouts.app>

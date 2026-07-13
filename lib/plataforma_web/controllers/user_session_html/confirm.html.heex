@@ -1,0 +1,114 @@
+<Layouts.app flash={@flash} current_scope={@current_scope}>
+  <section
+    id="confirm-page"
+    class={[
+      "relative isolate overflow-hidden rounded-2xl border border-base-300 bg-base-100 shadow-2xl shadow-base-content/10"
+    ]}
+  >
+    <div class={["flex items-center px-6 py-10 sm:px-10 lg:px-12 lg:py-12"]}>
+      <div class={["w-full max-w-md mx-auto"]}>
+        <div class={["text-center"]}>
+          <div class={[
+            "mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-base-content/5"
+          ]}>
+            <.icon name="hero-envelope" class={["size-6 text-base-content/60"]} />
+          </div>
+          <h2 class={["text-2xl font-bold tracking-tight text-base-content"]}>
+            Acesse sua conta
+          </h2>
+          <p class={["mt-2 text-sm text-base-content/60"]}>
+            {@user.email}
+          </p>
+        </div>
+
+        <.form
+          :if={!@user.confirmed_at}
+          for={@form}
+          id="confirmation_form"
+          action={~p"/users/log-in?_action=confirmed"}
+          phx-mounted={JS.focus_first()}
+          class={["mt-8 space-y-4"]}
+        >
+          <input type="hidden" name={@form[:token].name} value={@form[:token].value} />
+          <.button
+            name={@form[:remember_me].name}
+            value="true"
+            phx-disable-with="Confirmando..."
+            class={[
+              "group flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-base-content px-5 py-3.5",
+              "text-sm font-semibold text-base-100 shadow-lg shadow-base-content/15 transition duration-200",
+              "hover:-translate-y-0.5 hover:bg-base-content/90 hover:shadow-xl",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content disabled:cursor-wait disabled:opacity-70"
+            ]}
+          >
+            Confirmar e permanecer conectado
+          </.button>
+          <.button
+            phx-disable-with="Confirmando..."
+            class={[
+              "cursor-pointer rounded-xl border border-base-300 bg-base-100 px-5 py-3.5 w-full",
+              "text-sm font-semibold text-base-content transition",
+              "hover:-translate-y-0.5 hover:border-base-content/40 hover:bg-base-200/50",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content disabled:cursor-wait disabled:opacity-70"
+            ]}
+          >
+            Confirmar e entrar somente agora
+          </.button>
+        </.form>
+
+        <.form
+          :if={@user.confirmed_at}
+          for={@form}
+          id="login_form"
+          action={~p"/users/log-in"}
+          phx-mounted={JS.focus_first()}
+          class={["mt-8 space-y-4"]}
+        >
+          <input type="hidden" name={@form[:token].name} value={@form[:token].value} />
+          <%= if @current_scope do %>
+            <.button
+              phx-disable-with="Entrando..."
+              class={[
+                "group flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-base-content px-5 py-3.5",
+                "text-sm font-semibold text-base-100 shadow-lg shadow-base-content/15 transition duration-200",
+                "hover:-translate-y-0.5 hover:bg-base-content/90 hover:shadow-xl",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content disabled:cursor-wait disabled:opacity-70"
+              ]}
+            >
+              Entrar
+            </.button>
+          <% else %>
+            <.button
+              name={@form[:remember_me].name}
+              value="true"
+              phx-disable-with="Entrando..."
+              class={[
+                "group flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-base-content px-5 py-3.5",
+                "text-sm font-semibold text-base-100 shadow-lg shadow-base-content/15 transition duration-200",
+                "hover:-translate-y-0.5 hover:bg-base-content/90 hover:shadow-xl",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content disabled:cursor-wait disabled:opacity-70"
+              ]}
+            >
+              Entrar e permanecer conectado
+            </.button>
+            <.button
+              phx-disable-with="Entrando..."
+              class={[
+                "cursor-pointer rounded-xl border border-base-300 bg-base-100 px-5 py-3.5 w-full",
+                "text-sm font-semibold text-base-content transition",
+                "hover:-translate-y-0.5 hover:border-base-content/40 hover:bg-base-200/50",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-content disabled:cursor-wait disabled:opacity-70"
+              ]}
+            >
+              Entrar somente agora
+            </.button>
+          <% end %>
+        </.form>
+
+        <p :if={!@user.confirmed_at} class={["mt-6 text-center text-xs text-base-content/40"]}>
+          Dica: Você pode ativar o acesso por senha nas configurações da sua conta.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layouts.app>
