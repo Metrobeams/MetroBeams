@@ -1,0 +1,779 @@
+/* See the Tailwind configuration guide for advanced usage
+   https://tailwindcss.com/docs/configuration */
+
+@import "tailwindcss" source(none);
+@import "phoenix-colocated/plataforma/colocated.css";
+@source "../css";
+@source "../js";
+@source "../../lib/plataforma_web";
+/* Required for Tailwind to automatically pick up changes in colocated CSS files in dev */
+@source "../../_build/dev/phoenix-colocated/plataforma/*/";
+
+/* A Tailwind plugin that makes "hero-#{ICON}" classes available.
+   The heroicons installation itself is managed by your mix.exs */
+@plugin "../vendor/heroicons";
+
+/* daisyUI Tailwind Plugin. You can update this file by fetching the latest version with:
+   curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
+   Make sure to look at the daisyUI changelog: https://daisyui.com/docs/changelog/ */
+@plugin "../vendor/daisyui" {
+  themes: false;
+}
+
+/* daisyUI theme plugin. You can update this file by fetching the latest version with:
+  curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
+  We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
+  on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
+@plugin "../vendor/daisyui-theme" {
+  name: "dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: oklch(30.33% 0.016 252.42);
+  --color-base-200: oklch(25.26% 0.014 253.1);
+  --color-base-300: oklch(20.15% 0.012 254.09);
+  --color-base-content: oklch(97.807% 0.029 256.847);
+  --color-primary: oklch(58% 0.233 277.117);
+  --color-primary-content: oklch(96% 0.018 272.314);
+  --color-secondary: oklch(58% 0.233 277.117);
+  --color-secondary-content: oklch(96% 0.018 272.314);
+  --color-accent: oklch(60% 0.25 292.717);
+  --color-accent-content: oklch(96% 0.016 293.756);
+  --color-neutral: oklch(37% 0.044 257.287);
+  --color-neutral-content: oklch(98% 0.003 247.858);
+  --color-info: oklch(58% 0.158 241.966);
+  --color-info-content: oklch(97% 0.013 236.62);
+  --color-success: oklch(60% 0.118 184.704);
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: oklch(66% 0.179 58.318);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(58% 0.253 17.585);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "../vendor/daisyui-theme" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(98% 0 0);
+  --color-base-200: oklch(96% 0.001 286.375);
+  --color-base-300: oklch(92% 0.004 286.32);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-primary: oklch(70% 0.213 47.604);
+  --color-primary-content: oklch(98% 0.016 73.684);
+  --color-secondary: oklch(55% 0.027 264.364);
+  --color-secondary-content: oklch(98% 0.002 247.839);
+  --color-accent: oklch(0% 0 0);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(44% 0.017 285.786);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(62% 0.214 259.815);
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: oklch(70% 0.14 182.503);
+  --color-success-content: oklch(98% 0.014 180.72);
+  --color-warning: oklch(66% 0.179 58.318);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(58% 0.253 17.585);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Add variants based on LiveView classes */
+@custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
+
+/* Use the data attribute for dark mode  */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* Make LiveView wrapper divs transparent for layout */
+[data-phx-session], [data-phx-teleported-src] { display: contents }
+
+/* This file is for your main application CSS */
+
+/* Global zoom — 70% of original size */
+#app-content {
+  zoom: 0.7;
+}
+
+/* Carbon Header */
+#carbon-header {
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+#carbon-header a:focus-visible,
+#carbon-header button:focus-visible {
+  outline: 2px solid #0f62fe;
+  outline-offset: 2px;
+}
+
+#carbon-header .header-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: #525252;
+  border-radius: 0;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  position: relative;
+}
+
+#carbon-header .header-icon-btn:hover {
+  background: #f4f4f4;
+  color: #161616;
+}
+
+#header-search-panel {
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+#carbon-header .notification-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 50%;
+  background: #da1e28;
+  font-size: 8px;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] #carbon-header {
+  background: #262626;
+  border-bottom-color: #525252;
+}
+
+[data-theme="dark"] #carbon-header .header-icon-btn {
+  color: #c6c6c6;
+}
+
+[data-theme="dark"] #carbon-header .header-icon-btn:hover {
+  background: #393939;
+  color: #ffffff;
+}
+
+/* IBM Carbon sidebar layout */
+#carbon-sidebar {
+  --carbon-sidebar-width: 200px;
+  --carbon-sidebar-bg: #161616;
+  --carbon-sidebar-hover: #393939;
+  --carbon-sidebar-active: #262626;
+  --carbon-sidebar-border: #525252;
+  --carbon-sidebar-text: #c6c6c6;
+  --carbon-sidebar-text-active: #ffffff;
+  --carbon-blue-60: #0f62fe;
+}
+
+#carbon-sidebar aside {
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  width: var(--carbon-sidebar-width);
+  background: var(--carbon-sidebar-bg);
+  color: var(--carbon-sidebar-text);
+  flex-shrink: 0;
+  height: 100%;
+}
+
+#carbon-sidebar aside a {
+  border-radius: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+#carbon-sidebar aside a:hover {
+  background: var(--carbon-sidebar-hover);
+  color: var(--carbon-sidebar-text-active);
+}
+
+#carbon-sidebar aside a.active {
+  background: var(--carbon-sidebar-active);
+  color: var(--carbon-sidebar-text-active);
+  box-shadow: inset 3px 0 0 var(--carbon-blue-60);
+}
+
+#carbon-sidebar aside a.active {
+  background: var(--carbon-sidebar-active);
+  color: var(--carbon-sidebar-text-active);
+  box-shadow: inset 3px 0 0 var(--carbon-blue-60);
+}
+
+#carbon-sidebar aside .sidebar-section-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--carbon-sidebar-text);
+  padding: 0 1rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.375rem;
+}
+
+[data-theme="dark"] #carbon-sidebar aside {
+  background: #262626;
+  border-right-color: #525252;
+}
+
+/* Mobile sidebar toggle */
+#carbon-sidebar .sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+#carbon-sidebar .sidebar-toggle:checked ~ .sidebar-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#carbon-sidebar .sidebar-hamburger {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--carbon-sidebar-bg);
+  color: var(--carbon-sidebar-text);
+  cursor: pointer;
+}
+
+#carbon-sidebar aside {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 40;
+  transform: translateX(-100%);
+  transition: transform 0.2s;
+}
+
+#carbon-sidebar .sidebar-toggle:checked ~ aside {
+  transform: translateX(0);
+}
+
+@media (min-width: 768px) {
+  #carbon-sidebar .sidebar-hamburger {
+    display: none;
+  }
+
+  #carbon-sidebar aside {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    transform: none;
+    flex-shrink: 0;
+  }
+
+  #carbon-sidebar .sidebar-backdrop {
+    display: none;
+  }
+}
+
+/* IBM Carbon design system for home dashboard */
+#user-home[data-design-system="carbon"] {
+  --carbon-blue-60: #0f62fe;
+  --carbon-blue-70: #0043ce;
+  --carbon-gray-10: #f4f4f4;
+  --carbon-gray-20: #e0e0e0;
+  --carbon-gray-50: #8d8d8d;
+  --carbon-gray-90: #262626;
+  --carbon-gray-100: #161616;
+  --carbon-green-50: #24a148;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+#user-home[data-design-system="carbon"] h1,
+#user-home[data-design-system="carbon"] h2,
+#user-home[data-design-system="carbon"] h3 {
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+#user-home[data-design-system="carbon"] main > section:first-child {
+  border-radius: 0;
+  background: var(--carbon-gray-100);
+}
+
+#user-home[data-design-system="carbon"] main > section:first-child > div {
+  border-top: 3px solid var(--carbon-blue-60);
+}
+
+#user-home[data-design-system="carbon"] article {
+  border-radius: 0;
+  border: 1px solid var(--carbon-gray-20);
+}
+
+#user-home[data-design-system="carbon"] article:hover {
+  border-color: var(--carbon-blue-60);
+}
+
+#user-home[data-design-system="carbon"] article span:first-child {
+  background: var(--carbon-gray-100);
+  border-radius: 0;
+}
+
+#user-home[data-design-system="carbon"] article:hover span:first-child {
+  background: var(--carbon-blue-60);
+}
+
+#user-home[data-design-system="carbon"] article .inline-flex:last-child {
+  background: var(--carbon-green-50);
+  border-radius: 0;
+}
+
+#user-home[data-design-system="carbon"] :is(button, a):focus-visible {
+  outline: 2px solid var(--carbon-blue-60);
+  outline-offset: 2px;
+}
+
+[data-theme="dark"] #user-home[data-design-system="carbon"] article {
+  background: var(--carbon-gray-90);
+  border-color: #525252;
+}
+
+[data-theme="dark"] #user-home[data-design-system="carbon"] article:hover {
+  border-color: var(--carbon-blue-60);
+}
+
+/* IBM Carbon design system for settings page */
+#settings-page[data-design-system="carbon"] {
+  --carbon-blue-60: #0f62fe;
+  --carbon-blue-70: #0043ce;
+  --carbon-gray-10: #f4f4f4;
+  --carbon-gray-20: #e0e0e0;
+  --carbon-gray-50: #8d8d8d;
+  --carbon-gray-90: #262626;
+  --carbon-gray-100: #161616;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+#settings-page[data-design-system="carbon"] h1,
+#settings-page[data-design-system="carbon"] h2 {
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+#settings-page[data-design-system="carbon"] section {
+  border-radius: 0;
+}
+
+#settings-page[data-design-system="carbon"] :is(button, a):focus-visible {
+  outline: 2px solid var(--carbon-blue-60);
+  outline-offset: 2px;
+}
+
+[data-theme="dark"] #settings-page[data-design-system="carbon"] section {
+  background: var(--carbon-gray-90);
+  border-color: #525252;
+}
+
+[data-theme="dark"] #settings-page[data-design-system="carbon"] h1,
+[data-theme="dark"] #settings-page[data-design-system="carbon"] h2 {
+  color: #f4f4f4;
+}
+
+[data-theme="dark"] #settings-page[data-design-system="carbon"] p {
+  color: #c6c6c6;
+}
+
+[data-theme="dark"] #settings-page[data-design-system="carbon"] input {
+  color: #f4f4f4;
+  border-bottom-color: #525252;
+}
+
+[data-theme="dark"] #settings-page[data-design-system="carbon"] input:focus {
+  border-bottom-color: var(--carbon-blue-60);
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/IBMPlexSans-Light.woff") format("woff");
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/IBMPlexSans-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/IBMPlexSans-SemiBold.woff") format("woff");
+}
+
+/* IBM Carbon-inspired authentication surface */
+#login-page[data-design-system="carbon"] {
+  --carbon-blue-60: #0f62fe;
+  --carbon-blue-70: #0043ce;
+  --carbon-gray-10: #f4f4f4;
+  --carbon-gray-20: #e0e0e0;
+  --carbon-gray-50: #8d8d8d;
+  --carbon-gray-90: #262626;
+  --carbon-gray-100: #161616;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+#login-page[data-design-system="carbon"] > div {
+  border-top: 3px solid #ffffff;
+}
+
+#login-page[data-design-system="carbon"] > div > div:first-child {
+  background: var(--carbon-gray-100);
+}
+
+#login-page[data-design-system="carbon"] > div > div:last-child {
+  border-left: 1px solid var(--carbon-gray-20);
+  background: var(--carbon-gray-10);
+}
+
+#login-page[data-design-system="carbon"] h1,
+#login-page[data-design-system="carbon"] h2 {
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+#login-page[data-design-system="carbon"] input[type="email"],
+#login-page[data-design-system="carbon"] input[type="password"] {
+  min-height: 3rem;
+  border: 0;
+  border-bottom: 1px solid var(--carbon-gray-50);
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+#login-page[data-design-system="carbon"] input[type="email"]:focus,
+#login-page[data-design-system="carbon"] input[type="password"]:focus {
+  border-bottom-color: transparent;
+  outline: 2px solid var(--carbon-blue-60);
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
+#login-page[data-design-system="carbon"] #login-tabs > div:first-child {
+  gap: 0;
+  border-bottom: 1px solid var(--carbon-gray-20);
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+
+#login-page[data-design-system="carbon"] #login-tabs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+}
+
+#login-page[data-design-system="carbon"] #login-tabs > div:first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#login-page[data-design-system="carbon"] #panel-magic,
+#login-page[data-design-system="carbon"] #panel-password {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#login-page[data-design-system="carbon"] #panel-magic.hidden,
+#login-page[data-design-system="carbon"] #panel-password.hidden {
+  display: block;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#login-page[data-design-system="carbon"] #tab-magic,
+#login-page[data-design-system="carbon"] #tab-password {
+  border-radius: 0;
+  background: transparent;
+  color: var(--carbon-gray-100);
+  box-shadow: inset 0 -2px 0 transparent;
+}
+
+#login-page[data-design-system="carbon"] #tab-magic.bg-base-content,
+#login-page[data-design-system="carbon"] #tab-password.bg-base-content {
+  color: var(--carbon-blue-60);
+  box-shadow: inset 0 -2px 0 var(--carbon-blue-60);
+}
+
+#login-page[data-design-system="carbon"] #login-magic-submit,
+#login-page[data-design-system="carbon"] #login-password-submit,
+#login-page[data-design-system="carbon"] #login-resend-submit {
+  min-height: 3rem;
+  border-radius: 0;
+  background: var(--carbon-blue-60);
+  box-shadow: none;
+}
+
+#login-page[data-design-system="carbon"] #login-magic-submit:hover,
+#login-page[data-design-system="carbon"] #login-password-submit:hover,
+#login-page[data-design-system="carbon"] #login-resend-submit:hover {
+  background: var(--carbon-blue-70);
+  transform: none;
+}
+
+#login-page[data-design-system="carbon"] :is(button, a):focus-visible {
+  outline: 2px solid var(--carbon-blue-60);
+  outline-offset: 2px;
+}
+
+[data-theme="dark"] #login-page[data-design-system="carbon"] > div > div:last-child {
+  border-left-color: #525252;
+  background: var(--carbon-gray-90);
+}
+
+[data-theme="dark"] #login-page[data-design-system="carbon"] input[type="email"],
+[data-theme="dark"] #login-page[data-design-system="carbon"] input[type="password"] {
+  border-bottom-color: var(--carbon-gray-50);
+  background: #393939;
+  color: #f4f4f4;
+}
+
+[data-theme="dark"] #login-page[data-design-system="carbon"] #tab-magic,
+[data-theme="dark"] #login-page[data-design-system="carbon"] #tab-password {
+  color: #f4f4f4;
+}
+
+/* Carbon registration reuses the authentication tokens without replacing Phoenix inputs. */
+#registration-page[data-design-system="carbon"] {
+  --carbon-blue-60: #0f62fe;
+  --carbon-blue-70: #0043ce;
+  --carbon-gray-10: #f4f4f4;
+  --carbon-gray-20: #e0e0e0;
+  --carbon-gray-50: #8d8d8d;
+  --carbon-gray-90: #262626;
+  --carbon-gray-100: #161616;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+#registration-page[data-design-system="carbon"] > div {
+  border-top: 3px solid #ffffff;
+}
+
+#registration-page[data-design-system="carbon"] > div > div:first-child {
+  background: var(--carbon-gray-100);
+}
+
+#registration-page[data-design-system="carbon"] > div > div:last-child {
+  border-left: 1px solid var(--carbon-gray-20);
+  background: var(--carbon-gray-10);
+}
+
+#registration-page[data-design-system="carbon"] h1,
+#registration-page[data-design-system="carbon"] h2 {
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+#registration-page[data-design-system="carbon"] input[type="email"] {
+  min-height: 3rem;
+  border: 0;
+  border-bottom: 1px solid var(--carbon-gray-50);
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+#registration-page[data-design-system="carbon"] input[type="email"]:focus {
+  border-bottom-color: transparent;
+  outline: 2px solid var(--carbon-blue-60);
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
+#registration-page[data-design-system="carbon"] #registration-submit {
+  min-height: 3rem;
+  border-radius: 0;
+  background: var(--carbon-blue-60);
+  box-shadow: none;
+}
+
+#registration-page[data-design-system="carbon"] #registration-submit:hover {
+  background: var(--carbon-blue-70);
+}
+
+#registration-page[data-design-system="carbon"] :is(button, a):focus-visible {
+  outline: 2px solid var(--carbon-blue-60);
+  outline-offset: 2px;
+}
+
+[data-theme="dark"] #registration-page[data-design-system="carbon"] > div > div:last-child {
+  border-left-color: #525252;
+  background: var(--carbon-gray-90);
+}
+
+[data-theme="dark"] #registration-page[data-design-system="carbon"] input[type="email"] {
+  border-bottom-color: var(--carbon-gray-50);
+  background: #393939;
+  color: #f4f4f4;
+}
+
+/* Toast Container */
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 384px;
+}
+
+.toast-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: toast-slide-in 300ms ease-out;
+}
+
+.toast-item[data-status="error"] {
+  border-left: 4px solid #da1e28;
+}
+
+.toast-item[data-status="warning"] {
+  border-left: 4px solid #f1c21b;
+}
+
+.toast-item[data-status="success"] {
+  border-left: 4px solid #24a148;
+}
+
+.toast-item[data-status="info"] {
+  border-left: 4px solid #0f62fe;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+}
+
+.toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #161616;
+  margin: 0;
+}
+
+.toast-body {
+  font-size: 14px;
+  color: #525252;
+  margin: 4px 0 0;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #6f6f6f;
+}
+
+.toast-close:hover {
+  color: #161616;
+}
+
+.toast-exit {
+  animation: toast-slide-out 200ms ease-in forwards;
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .toast-item {
+    background: #262626;
+    border-color: #525252;
+  }
+
+  .toast-title {
+    color: #f4f4f4;
+  }
+
+  .toast-body {
+    color: #c6c6c6;
+  }
+
+  .toast-close {
+    color: #c6c6c6;
+  }
+
+  .toast-close:hover {
+    color: #f4f4f4;
+  }
+}
