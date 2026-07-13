@@ -29,7 +29,6 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
       conn = get(conn, ~p"/asset-categories/new")
       assert html_response(conn, 200) =~ "Nova Categoria"
     end
-
   end
 
   describe "create asset_category" do
@@ -107,9 +106,13 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
   end
 
   describe "authorization" do
-    test "user from another tenant sees only their categories", %{conn: conn, organization: organization} do
+    test "user from another tenant sees only their categories", %{
+      conn: conn,
+      organization: organization
+    } do
       # Create another user with their own organization
       other_user = user_fixture()
+
       {:ok, %{organization: other_org}} =
         Organizations.create_organization(other_user, %{name: "Other Org"})
 
@@ -133,14 +136,18 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
       # Login as the new user
       conn =
         build_conn()
-        |> Plug.Test.init_test_session(user_token: Plataforma.Accounts.generate_user_session_token(new_user))
+        |> Plug.Test.init_test_session(
+          user_token: Plataforma.Accounts.generate_user_session_token(new_user)
+        )
 
       conn = get(conn, ~p"/asset-categories")
       assert html_response(conn, 302)
       assert redirected_to(conn) == ~p"/"
     end
 
-    test "member role is redirected when trying to access categories", %{organization: organization} do
+    test "member role is redirected when trying to access categories", %{
+      organization: organization
+    } do
       # Create a member user
       member_user = user_fixture()
 
@@ -156,7 +163,9 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
       # Login as member
       conn =
         build_conn()
-        |> Plug.Test.init_test_session(user_token: Plataforma.Accounts.generate_user_session_token(member_user))
+        |> Plug.Test.init_test_session(
+          user_token: Plataforma.Accounts.generate_user_session_token(member_user)
+        )
 
       # Try to access categories - should be redirected
       conn = get(conn, ~p"/asset-categories")
@@ -181,7 +190,9 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
       # Login as technician
       conn =
         build_conn()
-        |> Plug.Test.init_test_session(user_token: Plataforma.Accounts.generate_user_session_token(technician_user))
+        |> Plug.Test.init_test_session(
+          user_token: Plataforma.Accounts.generate_user_session_token(technician_user)
+        )
 
       # Technician should be able to access categories
       conn = get(conn, ~p"/asset-categories")
@@ -204,7 +215,9 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
       # Login as admin
       conn =
         build_conn()
-        |> Plug.Test.init_test_session(user_token: Plataforma.Accounts.generate_user_session_token(admin_user))
+        |> Plug.Test.init_test_session(
+          user_token: Plataforma.Accounts.generate_user_session_token(admin_user)
+        )
 
       # Admin should be able to access categories
       conn = get(conn, ~p"/asset-categories")

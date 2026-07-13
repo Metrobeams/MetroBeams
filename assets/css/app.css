@@ -420,6 +420,31 @@
   border-color: var(--carbon-blue-60);
 }
 
+/* Page-level tokens prevent interactive button states from falling back to browser colors. */
+#asset-category-new[data-design-system="carbon"] {
+  --carbon-blue-60: #0f62fe;
+  --carbon-blue-70: #0043ce;
+  --carbon-blue-80: #002d9c;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+#asset-category-new [data-carbon-button="primary"] {
+  background-color: var(--carbon-blue-60, #0f62fe);
+}
+
+#asset-category-new [data-carbon-button="primary"]:hover {
+  background-color: var(--carbon-blue-70, #0043ce);
+}
+
+#asset-category-new [data-carbon-button="primary"]:active {
+  background-color: var(--carbon-blue-80, #002d9c);
+}
+
+#asset-category-new [data-carbon-button="primary"]:focus-visible {
+  outline: 2px solid var(--carbon-blue-60, #0f62fe);
+  outline-offset: 2px;
+}
+
 /* IBM Carbon design system for settings page */
 #settings-page[data-design-system="carbon"] {
   --carbon-blue-60: #0f62fe;

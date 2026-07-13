@@ -1,4 +1,6 @@
-# Plataforma
+## MetroBeams
+
+Open source IT asset management built with Elixir and the BEAM.
 
 To start your Phoenix server:
 
