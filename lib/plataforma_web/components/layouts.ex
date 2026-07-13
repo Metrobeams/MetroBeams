@@ -203,11 +203,9 @@ defmodule PlataformaWeb.Layouts do
                       </span>
                     </button>
                   </.form>
-                  <%= if is_nil(notification.read_at) do %>
-                    <div class="flex-shrink-0 mt-0.5">
-                      <NotificationCloseButton.close_button notification_id={notification.id} action={~p"/notifications/#{notification.id}/read"} />
-                    </div>
-                  <% end %>
+                  <div class="flex-shrink-0 mt-0.5">
+                    <NotificationCloseButton.close_button notification_id={notification.id} action={~p"/notifications/#{notification.id}/read"} />
+                  </div>
                 </li>
               </ul>
 
