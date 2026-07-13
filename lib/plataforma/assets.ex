@@ -6,6 +6,7 @@ defmodule Plataforma.Assets do
   import Ecto.Query
 
   alias Plataforma.Assets.AssetCategory
+  alias Plataforma.Assets.Manufacturer
   alias Plataforma.Repo
 
   @doc """
@@ -119,5 +120,80 @@ defmodule Plataforma.Assets do
   @spec change_category(AssetCategory.t()) :: Ecto.Changeset.t()
   def change_category(%AssetCategory{} = category) do
     AssetCategory.changeset(category, %{})
+  end
+
+  # Manufacturers
+
+  @doc """
+  Returns the list of active manufacturers for an organization.
+  """
+  @spec list_manufacturers(String.t()) :: [Manufacturer.t()]
+  def list_manufacturers(organization_id) do
+    Manufacturer
+    |> where([m], m.organization_id == ^organization_id and m.active)
+    |> order_by([m], asc: m.name)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets a single manufacturer.
+
+  Raises `Ecto.NoResultsError` if the Manufacturer does not exist,
+  belongs to a different organization, or is inactive.
+  """
+  @spec get_manufacturer!(String.t(), String.t()) :: Manufacturer.t()
+  def get_manufacturer!(organization_id, id) do
+    Manufacturer
+    |> where([m], m.id == ^id and m.organization_id == ^organization_id and m.active)
+    |> Repo.one!()
+  end
+
+  @doc """
+  Creates a manufacturer.
+  """
+  @spec create_manufacturer(String.t(), map()) ::
+          {:ok, Manufacturer.t()} | {:error, Ecto.Changeset.t()}
+  def create_manufacturer(organization_id, attrs) do
+    %Manufacturer{organization_id: organization_id}
+    |> Manufacturer.create_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a manufacturer.
+  """
+  @spec update_manufacturer(String.t(), Manufacturer.t(), map()) ::
+          {:ok, Manufacturer.t()} | {:error, Ecto.Changeset.t()}
+  def update_manufacturer(organization_id, %Manufacturer{} = manufacturer, attrs) do
+    if manufacturer.organization_id != organization_id do
+      raise ArgumentError, "Manufacturer does not belong to this organization"
+    end
+
+    manufacturer
+    |> Manufacturer.update_changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deactivates a manufacturer (soft delete).
+  """
+  @spec deactivate_manufacturer(String.t(), Manufacturer.t()) ::
+          {:ok, Manufacturer.t()}
+  def deactivate_manufacturer(organization_id, %Manufacturer{} = manufacturer) do
+    if manufacturer.organization_id != organization_id do
+      raise ArgumentError, "Manufacturer does not belong to this organization"
+    end
+
+    manufacturer
+    |> Manufacturer.deactivate_changeset()
+    |> Repo.update()
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking manufacturer changes.
+  """
+  @spec change_manufacturer(Manufacturer.t()) :: Ecto.Changeset.t()
+  def change_manufacturer(%Manufacturer{} = manufacturer) do
+    Manufacturer.create_changeset(manufacturer, %{})
   end
 end

@@ -84,6 +84,7 @@ defmodule PlataformaWeb.Router do
     get "/users/settings/confirm-email/:token", UserSettingsController, :confirm_email
 
     resources "/asset-categories", AssetCategoryController
+    resources "/manufacturers", ManufacturerController
   end
 
   scope "/", PlataformaWeb do

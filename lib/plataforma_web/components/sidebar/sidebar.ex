@@ -46,6 +46,13 @@ defmodule PlataformaWeb.Sidebar do
           active={String.starts_with?(@current_path, "/asset-categories")}
         />
         <.sidebar_link
+          id="sidebar-manufacturers-link"
+          href={~p"/manufacturers"}
+          icon="hero-building-office"
+          label="Fabricantes"
+          active={String.starts_with?(@current_path, "/manufacturers")}
+        />
+        <.sidebar_link
           id="sidebar-settings-link"
           href={~p"/users/settings"}
           icon="hero-cog-6-tooth"
