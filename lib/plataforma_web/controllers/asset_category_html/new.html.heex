@@ -1,0 +1,51 @@
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_path={@conn.request_path}
+  notification_summary={@notification_summary}
+  content_class="max-w-2xl"
+>
+  <div class="mb-8">
+    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
+      Assets
+    </p>
+    <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
+      Nova Categoria
+    </h1>
+  </div>
+
+  <.form
+    for={@form}
+    action={~p"/asset-categories"}
+    class="space-y-6"
+  >
+    <.input
+      field={@form[:name]}
+      type="text"
+      label="Nome"
+      placeholder="Ex: Notebooks, Desktops, Monitores"
+      required
+    />
+
+    <.input
+      field={@form[:description]}
+      type="textarea"
+      label="Descrição"
+      placeholder="Descrição opcional da categoria"
+      rows={3}
+    />
+
+    <div class="flex items-center gap-4">
+      <.button class="bg-[#0f62fe] text-white hover:bg-[#0353e9]">
+        Criar Categoria
+      </.button>
+
+      <.link
+        href={~p"/asset-categories"}
+        class="text-sm font-semibold text-[#0f62fe] hover:underline"
+      >
+        Cancelar
+      </.link>
+    </div>
+  </.form>
+</Layouts.app>

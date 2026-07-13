@@ -6,16 +6,13 @@ defmodule PlataformaWeb.Sidebar do
   def sidebar(assigns) do
     ~H"""
     <aside id="app-sidebar" class="sidebar-panel flex flex-col" data-sidebar-panel>
-      <div class="sidebar-brand flex items-center justify-between gap-2 px-4 py-4">
+      <div class="sidebar-brand flex items-center justify-center px-4 py-4">
         <.link
           href={~p"/"}
-          class="sidebar-brand-link flex min-w-0 items-center gap-2"
-          title="Plataforma"
+          class="sidebar-brand-link flex min-w-0 items-center justify-center"
+          title="MetroBeams"
         >
-          <span class="grid size-8 shrink-0 place-items-center bg-[#0f62fe] text-white">
-            <.icon name="hero-building-office-2" class="size-4" />
-          </span>
-          <span class="sidebar-label truncate text-sm font-semibold text-white">Plataforma</span>
+          <span class="sidebar-label truncate text-sm font-semibold text-white">MetroBeams</span>
         </.link>
 
         <button
@@ -40,6 +37,13 @@ defmodule PlataformaWeb.Sidebar do
           icon="hero-home"
           label="Início"
           active={@current_path == "/"}
+        />
+        <.sidebar_link
+          id="sidebar-assets-link"
+          href={~p"/asset-categories"}
+          icon="hero-tag"
+          label="Categorias"
+          active={String.starts_with?(@current_path, "/asset-categories")}
         />
         <.sidebar_link
           id="sidebar-settings-link"

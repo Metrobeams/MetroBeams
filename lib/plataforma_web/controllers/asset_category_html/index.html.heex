@@ -1,0 +1,81 @@
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_path={@conn.request_path}
+  notification_summary={@notification_summary}
+  content_class="max-w-6xl"
+>
+  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
+        Assets
+      </p>
+      <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
+        Categorias
+      </h1>
+    </div>
+
+    <.link
+      href={~p"/asset-categories/new"}
+      class="border border-[#0f62fe] bg-[#0f62fe] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0353e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]"
+    >
+      Nova Categoria
+    </.link>
+  </div>
+
+  <%= if Enum.empty?(@categories) do %>
+    <div
+      id="categories-empty"
+      class="border border-[#e0e0e0] bg-white px-6 py-12 text-center dark:border-[#525252] dark:bg-[#262626]"
+    >
+      <.icon name="hero-tag" class="mx-auto size-8 text-[#8d8d8d]" />
+      <p class="mt-4 text-sm text-[#525252] dark:text-[#c6c6c6]">
+        Nenhuma categoria cadastrada.
+      </p>
+      <.link
+        href={~p"/asset-categories/new"}
+        class="mt-4 inline-block text-sm font-semibold text-[#0f62fe] hover:underline"
+      >
+        Criar primeira categoria
+      </.link>
+    </div>
+  <% else %>
+    <div class="border border-[#e0e0e0] bg-white dark:border-[#525252] dark:bg-[#262626]">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-[#e0e0e0] dark:border-[#525252]">
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
+              Nome
+            </th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
+              Descrição
+            </th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
+              Ações
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#e0e0e0] dark:divide-[#525252]">
+          <%= for category <- @categories do %>
+            <tr class="hover:bg-[#f4f4f4] dark:hover:bg-[#393939]">
+              <td class="px-4 py-3 text-sm font-medium text-[#161616] dark:text-[#f4f4f4]">
+                {category.name}
+              </td>
+              <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
+                {category.description || "-"}
+              </td>
+              <td class="px-4 py-3 text-right">
+                <.link
+                  href={~p"/asset-categories/#{category}/edit"}
+                  class="text-xs font-semibold text-[#0f62fe] hover:underline"
+                >
+                  Editar
+                </.link>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</Layouts.app>
