@@ -97,6 +97,10 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :phoenix,
+       :filter_parameters,
+       ~w(password token enrollment_token credential authorization secret)
+
 # Configure ExAws for MinIO (S3-compatible storage)
 config :ex_aws,
   access_key_id: "minioadmin",

@@ -158,6 +158,49 @@ defmodule PlataformaWeb.AgentEnrollmentControllerTest do
            }
   end
 
+  @tag :conflict_http
+  test "concurrent HTTP enrollments return one 201 and one exact 409", %{
+    organization: organization
+  } do
+    {:ok, %{plaintext: first_token}} = Agents.create_enrollment_token(organization)
+    {:ok, %{plaintext: second_token}} = Agents.create_enrollment_token(organization)
+    params = valid_params(first_token, %{"machine_id" => "http-concurrent-machine"})
+
+    tasks = start_http_enrollments_together([first_token, second_token], params)
+
+    responses =
+      tasks
+      |> Enum.map(&Task.await(&1, 5_000))
+      |> Enum.sort_by(& &1.status)
+
+    assert [%Plug.Conn{status: 201}, %Plug.Conn{status: 409} = conflict] = responses
+
+    assert Jason.decode!(conflict.resp_body) == %{
+             "error" => %{
+               "code" => "enrollment_conflict",
+               "message" => "Agent enrollment conflicted with another request"
+             }
+           }
+  end
+
+  @tag :malformed_json
+  test "malformed JSON returns the stable invalid_request envelope", %{conn: conn} do
+    {_status, _headers, body} =
+      assert_error_sent 400, fn ->
+        conn
+        |> put_req_header("accept", "application/json")
+        |> put_req_header("content-type", "application/json")
+        |> post(~p"/api/v1/agents/enroll", "{")
+      end
+
+    assert Jason.decode!(body) == %{
+             "error" => %{
+               "code" => "invalid_request",
+               "message" => "Request body is invalid"
+             }
+           }
+  end
+
   defp valid_params(enrollment_token, overrides \\ %{}) do
     Map.merge(
       %{
@@ -176,5 +219,33 @@ defmodule PlataformaWeb.AgentEnrollmentControllerTest do
     conn
     |> put_req_header("content-type", "application/json")
     |> post(~p"/api/v1/agents/enroll", Jason.encode!(params))
+  end
+
+  defp start_http_enrollments_together(tokens, params) do
+    parent = self()
+
+    tasks =
+      Enum.map(tokens, fn token ->
+        Task.async(fn ->
+          send(parent, {:http_ready, self()})
+
+          receive do
+            :post ->
+              post_json(
+                Phoenix.ConnTest.build_conn(),
+                %{params | "enrollment_token" => token}
+              )
+          end
+        end)
+      end)
+
+    pids =
+      Enum.map(tasks, fn _task ->
+        assert_receive {:http_ready, pid}
+        pid
+      end)
+
+    Enum.each(pids, &send(&1, :post))
+    tasks
   end
 end

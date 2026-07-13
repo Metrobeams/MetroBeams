@@ -18,6 +18,11 @@ defmodule PlataformaWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :agent_api do
+    plug :accepts, ["json"]
+    plug PlataformaWeb.Plugs.RequireJSONContentType
+  end
+
   pipeline :authenticated_api do
     plug :accepts, ["json"]
     plug :fetch_session
@@ -38,6 +43,12 @@ defmodule PlataformaWeb.Router do
     get "/account", AccountController, :show
     put "/account/avatar", AccountController, :update_avatar
     delete "/account/avatar", AccountController, :delete_avatar
+  end
+
+  scope "/api/v1", PlataformaWeb do
+    pipe_through :agent_api
+
+    post "/agents/enroll", AgentEnrollmentController, :create
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
