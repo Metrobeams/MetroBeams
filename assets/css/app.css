@@ -333,25 +333,25 @@
   border-top: 3px solid var(--carbon-blue-60);
 }
 
-#user-home[data-design-system="carbon"] article {
+#user-home[data-design-system="carbon"] article:not([data-organization-card]) {
   border-radius: 0;
   border: 1px solid var(--carbon-gray-20);
 }
 
-#user-home[data-design-system="carbon"] article:hover {
+#user-home[data-design-system="carbon"] article:not([data-organization-card]):hover {
   border-color: var(--carbon-blue-60);
 }
 
-#user-home[data-design-system="carbon"] article span:first-child {
+#user-home[data-design-system="carbon"] article:not([data-organization-card]) span:first-child {
   background: var(--carbon-gray-100);
   border-radius: 0;
 }
 
-#user-home[data-design-system="carbon"] article:hover span:first-child {
+#user-home[data-design-system="carbon"] article:not([data-organization-card]):hover span:first-child {
   background: var(--carbon-blue-60);
 }
 
-#user-home[data-design-system="carbon"] article .inline-flex:last-child {
+#user-home[data-design-system="carbon"] article:not([data-organization-card]) .inline-flex:last-child {
   background: var(--carbon-green-50);
   border-radius: 0;
 }
@@ -731,6 +731,27 @@
 
 .toast-exit {
   animation: toast-slide-out 200ms ease-in forwards;
+}
+
+.dark .toast-item {
+  background: #262626;
+  border: 1px solid #525252;
+}
+
+.dark .toast-title {
+  color: #f4f4f4;
+}
+
+.dark .toast-body {
+  color: #c6c6c6;
+}
+
+.dark .toast-close {
+  color: #c6c6c6;
+}
+
+.dark .toast-close:hover {
+  color: #f4f4f4;
 }
 
 @keyframes toast-slide-in {
