@@ -319,5 +319,183 @@ defmodule Plataforma.Assets.ManufacturersTest do
 
       assert manufacturer.support_url == nil
     end
+
+    # Additional list tests
+
+    test "list_manufacturers/2 returns empty list when no manufacturers exist", %{
+      organization: organization
+    } do
+      assert Assets.list_manufacturers(organization.id) == []
+    end
+
+    # Additional create tests
+
+    test "create_manufacturer/2 accepts valid website URL", %{organization: organization} do
+      {:ok, manufacturer} =
+        Assets.create_manufacturer(organization.id, %{name: "Dell", website: "https://dell.com"})
+
+      assert manufacturer.website == "https://dell.com"
+    end
+
+    test "create_manufacturer/2 accepts valid support_url", %{organization: organization} do
+      {:ok, manufacturer} =
+        Assets.create_manufacturer(organization.id, %{
+          name: "Dell",
+          support_url: "https://support.dell.com"
+        })
+
+      assert manufacturer.support_url == "https://support.dell.com"
+    end
+
+    test "create_manufacturer/2 rejects empty name", %{organization: organization} do
+      assert {:error, changeset} =
+               Assets.create_manufacturer(organization.id, %{name: ""})
+
+      assert errors_on(changeset).name
+    end
+
+    test "create_manufacturer/2 rejects name with only spaces", %{organization: organization} do
+      assert {:error, changeset} =
+               Assets.create_manufacturer(organization.id, %{name: "   "})
+
+      assert errors_on(changeset).name
+    end
+
+    # Additional update tests
+
+    test "update_manufacturer/2 updates website", %{organization: organization} do
+      {:ok, manufacturer} = Assets.create_manufacturer(organization.id, %{name: "Dell"})
+
+      {:ok, updated} =
+        Assets.update_manufacturer(organization.id, manufacturer, %{
+          website: "https://new-dell.com"
+        })
+
+      assert updated.website == "https://new-dell.com"
+    end
+
+    test "update_manufacturer/2 updates support_url", %{organization: organization} do
+      {:ok, manufacturer} = Assets.create_manufacturer(organization.id, %{name: "Dell"})
+
+      {:ok, updated} =
+        Assets.update_manufacturer(organization.id, manufacturer, %{
+          support_url: "https://new-support.dell.com"
+        })
+
+      assert updated.support_url == "https://new-support.dell.com"
+    end
+
+    test "update_manufacturer/2 preserves organization_id", %{organization: organization} do
+      {:ok, manufacturer} = Assets.create_manufacturer(organization.id, %{name: "Dell"})
+
+      {:ok, updated} =
+        Assets.update_manufacturer(organization.id, manufacturer, %{name: "Dell Inc."})
+
+      assert updated.organization_id == organization.id
+    end
+
+    test "update_manufacturer/2 preserves active status", %{organization: organization} do
+      {:ok, manufacturer} = Assets.create_manufacturer(organization.id, %{name: "Dell"})
+
+      {:ok, updated} =
+        Assets.update_manufacturer(organization.id, manufacturer, %{name: "Dell Inc."})
+
+      assert updated.active == true
+    end
+
+    test "update_manufacturer/2 rejects duplicate name", %{organization: organization} do
+      {:ok, _} = Assets.create_manufacturer(organization.id, %{name: "Dell"})
+      {:ok, lenovo} = Assets.create_manufacturer(organization.id, %{name: "Lenovo"})
+
+      assert {:error, changeset} =
+               Assets.update_manufacturer(organization.id, lenovo, %{name: "Dell"})
+
+      assert "já existe um fabricante com este nome nesta organização" in errors_on(changeset).name
+    end
+
+    test "update_manufacturer/2 does not update manufacturer from another organization", %{
+      user: user,
+      organization: organization
+    } do
+      {:ok, %{organization: other_org}} =
+        Organizations.create_organization(user, %{
+          name: "Other Org #{System.unique_integer([:positive])}"
+        })
+
+      {:ok, other_manufacturer} = Assets.create_manufacturer(other_org.id, %{name: "Lenovo"})
+
+      assert_raise ArgumentError, fn ->
+        Assets.update_manufacturer(organization.id, other_manufacturer, %{name: "Hacked"})
+      end
+    end
+
+    test "update_manufacturer/2 ignores organization_id from client", %{
+      organization: organization
+    } do
+      {:ok, manufacturer} = Assets.create_manufacturer(organization.id, %{name: "Dell"})
+      other_org_id = Ecto.UUID.generate()
+
+      {:ok, updated} =
+        Assets.update_manufacturer(organization.id, manufacturer, %{
+          name: "Dell Inc.",
+          organization_id: other_org_id
+        })
+
+      assert updated.organization_id == organization.id
+    end
+
+    test "update_manufacturer/2 ignores active from client", %{organization: organization} do
+      {:ok, manufacturer} = Assets.create_manufacturer(organization.id, %{name: "Dell"})
+
+      {:ok, updated} =
+        Assets.update_manufacturer(organization.id, manufacturer, %{
+          name: "Dell Inc.",
+          active: false
+        })
+
+      assert updated.active == true
+    end
+
+    # Additional deactivate tests
+
+    test "deactivate_manufacturer/2 removes manufacturer from listing", %{
+      organization: organization
+    } do
+      {:ok, manufacturer} = Assets.create_manufacturer(organization.id, %{name: "Dell"})
+      {:ok, _} = Assets.deactivate_manufacturer(organization.id, manufacturer)
+
+      manufacturers = Assets.list_manufacturers(organization.id)
+      refute Enum.any?(manufacturers, &(&1.id == manufacturer.id))
+    end
+
+    test "deactivate_manufacturer/2 does not deactivate manufacturer from another organization",
+         %{
+           user: user,
+           organization: organization
+         } do
+      {:ok, %{organization: other_org}} =
+        Organizations.create_organization(user, %{
+          name: "Other Org #{System.unique_integer([:positive])}"
+        })
+
+      {:ok, other_manufacturer} = Assets.create_manufacturer(other_org.id, %{name: "Lenovo"})
+
+      assert_raise ArgumentError, fn ->
+        Assets.deactivate_manufacturer(organization.id, other_manufacturer)
+      end
+    end
+
+    test "deactivate_manufacturer/2 allows recreation with different capitalization", %{
+      organization: organization
+    } do
+      {:ok, manufacturer} = Assets.create_manufacturer(organization.id, %{name: "Dell"})
+      {:ok, _} = Assets.deactivate_manufacturer(organization.id, manufacturer)
+
+      assert {:ok, %Manufacturer{} = new_manufacturer} =
+               Assets.create_manufacturer(organization.id, %{name: "DELL"})
+
+      assert new_manufacturer.name == "DELL"
+      assert new_manufacturer.id != manufacturer.id
+    end
   end
 end
