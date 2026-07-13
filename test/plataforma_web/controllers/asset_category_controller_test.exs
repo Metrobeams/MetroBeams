@@ -20,7 +20,7 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
       {:ok, _category} = Assets.create_category(organization.id, %{name: "Notebooks"})
 
       conn = get(conn, ~p"/asset-categories")
-      assert html_response(conn, 200) =~ "Notebooks"
+      assert html_response(conn, 200) =~ "notebooks"
     end
   end
 
@@ -41,7 +41,7 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
       assert redirected_to(conn) == ~p"/asset-categories"
 
       conn = get(conn, ~p"/asset-categories")
-      assert html_response(conn, 200) =~ "Notebooks"
+      assert html_response(conn, 200) =~ "notebooks"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -78,7 +78,7 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
       assert redirected_to(conn) == ~p"/asset-categories"
 
       conn = get(conn, ~p"/asset-categories")
-      assert html_response(conn, 200) =~ "Laptops"
+      assert html_response(conn, 200) =~ "laptops"
     end
 
     test "renders errors when data is invalid", %{conn: conn, organization: organization} do
@@ -125,8 +125,8 @@ defmodule PlataformaWeb.AssetCategoryControllerTest do
       # User should only see their own organization's categories
       conn = get(conn, ~p"/asset-categories")
       response = html_response(conn, 200)
-      assert response =~ "Notebooks"
-      refute response =~ "Desktops"
+      assert response =~ "notebooks"
+      refute response =~ "desktops"
     end
 
     test "user without organization is redirected", %{user: _user} do

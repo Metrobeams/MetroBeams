@@ -24,9 +24,21 @@ defmodule Plataforma.Assets.AssetCategory do
     |> cast(attrs, [:name, :description])
     |> validate_required([:name])
     |> validate_length(:name, min: 2, max: 100)
+    |> normalize_name()
     |> unique_constraint(:name,
       name: :asset_categories_organization_name_unique_index,
       message: "já existe uma categoria com este nome nesta organização"
     )
+  end
+
+  defp normalize_name(changeset) do
+    case get_change(changeset, :name) do
+      nil ->
+        changeset
+
+      name ->
+        normalized = name |> String.trim() |> String.downcase()
+        put_change(changeset, :name, normalized)
+    end
   end
 end

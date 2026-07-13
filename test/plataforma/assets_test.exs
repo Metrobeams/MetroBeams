@@ -70,7 +70,7 @@ defmodule Plataforma.AssetsTest do
       assert {:ok, %AssetCategory{} = category} =
                Assets.create_category(organization.id, valid_attrs)
 
-      assert category.name == "Notebooks"
+      assert category.name == "notebooks"
       assert category.description == "Laptops e notebooks"
       assert category.organization_id == organization.id
       assert category.active == true
@@ -116,7 +116,7 @@ defmodule Plataforma.AssetsTest do
       assert {:ok, %AssetCategory{} = category} =
                Assets.update_category(organization.id, category, update_attrs)
 
-      assert category.name == "Laptops"
+      assert category.name == "laptops"
       assert category.description == "Atualizado"
     end
 
@@ -157,7 +157,7 @@ defmodule Plataforma.AssetsTest do
 
       categories = Assets.list_categories(organization.id)
       assert length(categories) == 1
-      assert hd(categories).name == "Desktops"
+      assert hd(categories).name == "desktops"
     end
 
     test "create_category/2 ignores organization_id from client", %{organization: organization} do
@@ -208,6 +208,61 @@ defmodule Plataforma.AssetsTest do
     test "change_category/1 returns a category changeset", %{organization: organization} do
       {:ok, category} = Assets.create_category(organization.id, %{name: "Notebooks"})
       assert %Ecto.Changeset{} = Assets.change_category(category)
+    end
+
+    # Case insensitivity and trimming tests
+
+    test "create_category/2 trims and downcases name", %{organization: organization} do
+      {:ok, category} = Assets.create_category(organization.id, %{name: "  Notebook  "})
+      assert category.name == "notebook"
+    end
+
+    test "create_category/2 downcases name", %{organization: organization} do
+      {:ok, category} = Assets.create_category(organization.id, %{name: "NOTEBOOK"})
+      assert category.name == "notebook"
+    end
+
+    test "create_category/2 with 'Notebook' and 'notebook' are considered duplicates", %{
+      organization: organization
+    } do
+      {:ok, _category} = Assets.create_category(organization.id, %{name: "Notebook"})
+
+      assert {:error, changeset} =
+               Assets.create_category(organization.id, %{name: "notebook"})
+
+      assert "já existe uma categoria com este nome nesta organização" in errors_on(changeset).name
+    end
+
+    test "Notebook can exist in different tenants", %{user: user, organization: organization} do
+      {:ok, _category} = Assets.create_category(organization.id, %{name: "Notebook"})
+
+      {:ok, %{organization: other_org}} =
+        Organizations.create_organization(user, %{
+          name: "Other Org #{System.unique_integer([:positive])}"
+        })
+
+      assert {:ok, %AssetCategory{}} = Assets.create_category(other_org.id, %{name: "Notebook"})
+    end
+
+    test "after deactivating Notebook, it is possible to create notebook again", %{
+      organization: organization
+    } do
+      {:ok, category} = Assets.create_category(organization.id, %{name: "Notebook"})
+      {:ok, _} = Assets.delete_category(category)
+
+      # Should be able to create with same name (case insensitive)
+      assert {:ok, %AssetCategory{} = new_category} =
+               Assets.create_category(organization.id, %{name: "notebook"})
+
+      assert new_category.name == "notebook"
+      assert new_category.id != category.id
+    end
+
+    test "update_category/2 trims and downcases name", %{organization: organization} do
+      {:ok, category} = Assets.create_category(organization.id, %{name: "Notebooks"})
+
+      {:ok, updated} = Assets.update_category(organization.id, category, %{name: "  LAPTOPS  "})
+      assert updated.name == "laptops"
     end
   end
 end
