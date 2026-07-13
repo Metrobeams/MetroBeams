@@ -12,7 +12,8 @@ defmodule Plataforma.Organizations.Policy do
     invite_member: [:owner, :admin],
     update_member: [:owner, :admin],
     deactivate_member: [:owner, :admin],
-    change_member_role: [:owner]
+    change_member_role: [:owner],
+    manage_categories: [:owner, :admin, :technician]
   }
 
   @impl true
