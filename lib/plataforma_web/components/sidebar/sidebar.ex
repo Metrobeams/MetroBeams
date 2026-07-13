@@ -10,7 +10,7 @@ defmodule PlataformaWeb.Sidebar do
   def sidebar(assigns) do
     ~H"""
     <aside id="app-sidebar" class="sidebar-panel flex flex-col" data-sidebar-panel>
-      <div class="sidebar-brand flex items-center justify-center px-4 py-4">
+      <div class="sidebar-brand relative flex items-center justify-center px-4 py-4">
         <.link
           href={~p"/"}
           class="sidebar-brand-link flex min-w-0 items-center justify-center"
@@ -22,8 +22,9 @@ defmodule PlataformaWeb.Sidebar do
         <button
           type="button"
           id="sidebar-collapse-toggle"
-          class="sidebar-collapse-control hidden size-8 shrink-0 place-items-center md:grid"
-          aria-label="Recolher menu lateral"
+          class="sidebar-collapse-control absolute right-0 top-0 hidden h-10 w-10 items-center justify-center md:flex"
+          aria-label="Recolher menu"
+          title="Recolher menu"
           aria-controls="app-sidebar"
           aria-expanded="true"
           data-sidebar-collapse

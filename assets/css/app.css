@@ -212,6 +212,7 @@
 
 #carbon-sidebar .sidebar-collapse-control {
   color: var(--carbon-sidebar-text);
+  transition: background 0.15s, color 0.15s;
 }
 
 #carbon-sidebar .sidebar-collapse-control:hover {
