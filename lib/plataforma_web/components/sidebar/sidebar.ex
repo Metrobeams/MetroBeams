@@ -43,6 +43,9 @@ defmodule PlataformaWeb.Sidebar do
           label="Início"
           active={@current_path == "/"}
         />
+
+        <div class="my-2 border-t border-[#393939]" aria-hidden="true"></div>
+
         <.sidebar_link
           id="sidebar-assets-link"
           href={~p"/asset-categories"}
@@ -57,6 +60,9 @@ defmodule PlataformaWeb.Sidebar do
           label="Fabricantes"
           active={String.starts_with?(@current_path, "/manufacturers")}
         />
+      </nav>
+
+      <nav class="sidebar-navigation border-t border-[#393939] px-3 py-2" aria-label="Configurações">
         <.sidebar_link
           id="sidebar-settings-link"
           href={~p"/users/settings"}
