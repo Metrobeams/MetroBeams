@@ -5,58 +5,73 @@
   notification_summary={@notification_summary}
   content_class="max-w-2xl"
 >
-  <div class="mb-8">
-    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
-      Assets
-    </p>
-    <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
-      Editar Categoria
-    </h1>
-  </div>
+  <div id="asset-category-edit" data-design-system="carbon">
+    <div class="mb-8">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
+        Assets
+      </p>
+      <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
+        Editar Categoria
+      </h1>
+      <p class="mt-2 text-sm text-[#525252] dark:text-[#c6c6c6]">
+        Atualize as informações da categoria.
+      </p>
+    </div>
 
-  <.form
-    for={@form}
-    action={~p"/asset-categories/#{@category}"}
-    class="space-y-6"
-  >
-    <.input
-      field={@form[:name]}
-      type="text"
-      label="Nome"
-      placeholder="Ex: Notebooks, Desktops, Monitores"
-      required
-    />
+    <.form
+      for={@form}
+      action={~p"/asset-categories/#{@category}"}
+      class="space-y-8"
+    >
+      <div>
+        <.input
+          field={@form[:name]}
+          type="text"
+          label="Nome"
+          placeholder="Ex: Notebooks, Desktops, Monitores"
+          required
+        />
+        <p class="mt-1 text-xs text-[#6f6f6f] dark:text-[#a1a1a1]">
+          Nome único para identificar a categoria dentro da organização.
+        </p>
+      </div>
 
-    <.input
-      field={@form[:description]}
-      type="textarea"
-      label="Descrição"
-      placeholder="Descrição opcional da categoria"
-      rows={3}
-    />
+      <.input
+        field={@form[:description]}
+        type="textarea"
+        label="Descrição"
+        placeholder="Descrição opcional da categoria"
+        rows={3}
+      />
 
-    <div class="flex items-center gap-4">
-      <.button class="bg-[#0f62fe] text-white hover:bg-[#0353e9]">
-        Salvar Alterações
-      </.button>
+      <div class="flex w-full max-w-[40rem] flex-col gap-4 sm:flex-row sm:justify-end">
+        <.link
+          href={~p"/asset-categories"}
+          data-carbon-button="secondary"
+          class="inline-flex min-h-12 items-center justify-center rounded-none border-0 bg-[#393939] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4c4c4c] active:bg-[#6f6f6f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--carbon-blue-60)] sm:max-w-80"
+        >
+          Cancelar
+        </.link>
 
+        <button
+          type="submit"
+          data-carbon-button="primary"
+          class="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-none border-0 bg-[#0f62fe] px-4 py-3 text-sm font-semibold text-white shadow-none transition-colors hover:bg-[#0353e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe] sm:max-w-80"
+        >
+          Salvar Alterações
+        </button>
+      </div>
+    </.form>
+
+    <div class="mt-8 border-t border-[#e0e0e0] pt-6 dark:border-[#525252]">
       <.link
-        href={~p"/asset-categories"}
-        class="text-sm font-semibold text-[#0f62fe] hover:underline"
+        href={~p"/asset-categories/#{@category}"}
+        method="delete"
+        data-confirm="Tem certeza que deseja excluir esta categoria?"
+        class="text-sm font-semibold text-[#da1e28] hover:underline"
       >
-        Cancelar
+        Excluir Categoria
       </.link>
     </div>
-  </.form>
-
-  <div class="mt-8 border-t border-[#e0e0e0] pt-6 dark:border-[#525252]">
-    <.link
-      href={~p"/asset-categories/#{@category}"}
-      method="delete"
-      data-confirm="Tem certeza que deseja excluir esta categoria?"
-      class="text-sm font-semibold text-[#da1e28] hover:underline"
-    >
-      Excluir Categoria
-    </.link>
   </div>
 </Layouts.app>

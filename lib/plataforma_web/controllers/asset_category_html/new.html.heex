@@ -13,20 +13,28 @@
       <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
         Nova Categoria
       </h1>
+      <p class="mt-2 text-sm text-[#525252] dark:text-[#c6c6c6]">
+        Crie uma categoria para organizar seus ativos.
+      </p>
     </div>
 
     <.form
       for={@form}
       action={~p"/asset-categories"}
-      class="space-y-6"
+      class="space-y-8"
     >
-      <.input
-        field={@form[:name]}
-        type="text"
-        label="Nome"
-        placeholder="Ex: Notebooks, Desktops, Monitores"
-        required
-      />
+      <div>
+        <.input
+          field={@form[:name]}
+          type="text"
+          label="Nome"
+          placeholder="Ex: Notebooks, Desktops, Monitores"
+          required
+        />
+        <p class="mt-1 text-xs text-[#6f6f6f] dark:text-[#a1a1a1]">
+          Nome único para identificar a categoria dentro da organização.
+        </p>
+      </div>
 
       <.input
         field={@form[:description]}
@@ -36,31 +44,22 @@
         rows={3}
       />
 
-      <div class="flex w-full max-w-[40rem] flex-col sm:flex-row">
-        <button
-          type="submit"
-          data-carbon-button="primary"
-          class="inline-flex min-h-12 w-full cursor-pointer items-center justify-between rounded-none border-0 px-4 py-3 text-left text-sm font-semibold text-white shadow-none transition-colors sm:max-w-80"
-        >
-          <span>Criar categoria</span>
-          <svg
-            viewBox="0 0 32 32"
-            width="16"
-            height="16"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M17 15 17 8 15 8 15 15 8 15 8 17 15 17 15 24 17 24 17 17 24 17 24 15z" />
-          </svg>
-        </button>
-
+      <div class="flex w-full max-w-[40rem] flex-col gap-4 sm:flex-row sm:justify-end">
         <.link
           href={~p"/asset-categories"}
           data-carbon-button="secondary"
-          class="inline-flex min-h-12 w-full items-center rounded-none border-0 bg-[#393939] px-4 py-3 text-left text-sm font-semibold text-white transition-colors hover:bg-[#4c4c4c] active:bg-[#6f6f6f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--carbon-blue-60)] sm:max-w-80"
+          class="inline-flex min-h-12 items-center justify-center rounded-none border-0 bg-[#393939] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4c4c4c] active:bg-[#6f6f6f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--carbon-blue-60)] sm:max-w-80"
         >
           Cancelar
         </.link>
+
+        <button
+          type="submit"
+          data-carbon-button="primary"
+          class="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-none border-0 bg-[#0f62fe] px-4 py-3 text-sm font-semibold text-white shadow-none transition-colors hover:bg-[#0353e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe] sm:max-w-80"
+        >
+          Criar categoria
+        </button>
       </div>
     </.form>
   </div>
