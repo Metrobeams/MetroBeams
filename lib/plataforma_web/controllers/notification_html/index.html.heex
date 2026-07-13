@@ -69,7 +69,10 @@
             </div>
 
             <%= if is_nil(notification.read_at) do %>
-              <PlataformaWeb.NotificationCloseButton.close_button notification_id={notification.id} action={~p"/notifications/#{notification.id}/read"} />
+              <PlataformaWeb.NotificationCloseButton.close_button
+                notification_id={notification.id}
+                action={~p"/notifications/#{notification.id}/read"}
+              />
             <% end %>
           </div>
         </li>

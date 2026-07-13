@@ -100,7 +100,10 @@ defmodule PlataformaWeb.NotificationControllerTest do
     assert document |> LazyHTML.query(".notification-close-btn") |> Enum.count() > 0
   end
 
-  test "GET /notifications uses status-specific left border for unread notifications", %{conn: conn, user: user} do
+  test "GET /notifications uses status-specific left border for unread notifications", %{
+    conn: conn,
+    user: user
+  } do
     {:ok, notification} =
       Notifications.create_notification(user, %{
         status: :warning,
@@ -116,12 +119,17 @@ defmodule PlataformaWeb.NotificationControllerTest do
       |> html_response(200)
       |> LazyHTML.from_document()
 
-    [notification_el] = document |> LazyHTML.query("#notification-#{notification.id}") |> Enum.to_list()
+    [notification_el] =
+      document |> LazyHTML.query("#notification-#{notification.id}") |> Enum.to_list()
+
     [class_attr] = LazyHTML.attribute(notification_el, "class")
     assert class_attr =~ "border-l-[#f1c21b]"
   end
 
-  test "GET /notifications shows status-specific left border color per status", %{conn: conn, user: user} do
+  test "GET /notifications shows status-specific left border color per status", %{
+    conn: conn,
+    user: user
+  } do
     {:ok, success_notif} =
       Notifications.create_notification(user, %{
         status: :success,
@@ -146,7 +154,9 @@ defmodule PlataformaWeb.NotificationControllerTest do
       |> html_response(200)
       |> LazyHTML.from_document()
 
-    [success_el] = document |> LazyHTML.query("#notification-#{success_notif.id}") |> Enum.to_list()
+    [success_el] =
+      document |> LazyHTML.query("#notification-#{success_notif.id}") |> Enum.to_list()
+
     [error_el] = document |> LazyHTML.query("#notification-#{error_notif.id}") |> Enum.to_list()
 
     [success_class] = LazyHTML.attribute(success_el, "class")
