@@ -1,7 +1,13 @@
 defmodule PlataformaWeb.PageControllerTest do
   use PlataformaWeb.ConnCase
 
+  import Mox
   import Plataforma.AccountsFixtures
+
+  alias Plataforma.Accounts
+  alias Plataforma.StorageMock
+
+  setup :verify_on_exit!
 
   test "GET / redirects visitors to login", %{conn: conn} do
     conn = get(conn, ~p"/")
@@ -36,6 +42,31 @@ defmodule PlataformaWeb.PageControllerTest do
     topbar_user = LazyHTML.query(document, "#header-user-menu-toggle [data-user-display-name]")
     assert LazyHTML.text(topbar_user) =~ name
     refute LazyHTML.text(topbar_user) =~ user.email
+  end
+
+  test "GET / renders the stored avatar in the topbar", %{conn: conn} do
+    user = user_fixture()
+    key = "avatars/#{user.id}/#{Ecto.UUID.generate()}.webp"
+    resolved_url = "https://media.example/#{key}"
+
+    {:ok, user} =
+      Accounts.update_user_avatar(user, %{
+        avatar_key: key,
+        avatar_content_type: "image/webp",
+        avatar_size: byte_size(key),
+        avatar_updated_at: DateTime.utc_now(:second)
+      })
+
+    expect(StorageMock, :url, fn ^key -> {:ok, resolved_url} end)
+
+    document =
+      conn
+      |> log_in_user(user)
+      |> get(~p"/")
+      |> html_response(200)
+      |> LazyHTML.from_document()
+
+    assert_element(document, "#header-user-avatar[src='#{resolved_url}']")
   end
 
   test "GET / renders accessible controls for the responsive sidebar", %{conn: conn} do

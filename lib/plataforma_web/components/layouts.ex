@@ -5,6 +5,7 @@ defmodule PlataformaWeb.Layouts do
   """
   use PlataformaWeb, :html
 
+  alias Plataforma.Media.Avatar
   alias PlataformaWeb.NotificationIcons
   alias PlataformaWeb.NotificationCloseButton
   alias PlataformaWeb.Sidebar
@@ -88,6 +89,8 @@ defmodule PlataformaWeb.Layouts do
   attr :notification_summary, :map, required: true
 
   def app_header(assigns) do
+    assigns = assign(assigns, :avatar_url, user_avatar_url(assigns.current_scope.user))
+
     ~H"""
     <header id="carbon-header">
       <div class="flex items-center justify-between h-14 px-4 pr-6">
@@ -245,7 +248,17 @@ defmodule PlataformaWeb.Layouts do
               aria-expanded="false"
               aria-controls="header-user-menu"
             >
-              <span class="flex size-8 items-center justify-center rounded-full bg-[#0f62fe] text-xs font-semibold text-white">
+              <img
+                :if={@avatar_url}
+                id="header-user-avatar"
+                src={@avatar_url}
+                alt=""
+                class="size-8 rounded-full border border-[#c6c6c6] bg-[#f4f4f4] object-cover"
+              />
+              <span
+                :if={is_nil(@avatar_url)}
+                class="flex size-8 items-center justify-center rounded-full bg-[#0f62fe] text-xs font-semibold text-white"
+              >
                 {user_initial(@current_scope.user)}
               </span>
               <span
@@ -338,6 +351,10 @@ defmodule PlataformaWeb.Layouts do
 
   defp user_display_name(%{name: name}) when is_binary(name) and name != "", do: name
   defp user_display_name(_user), do: "Usuário"
+
+  defp user_avatar_url(%{avatar_key: nil}), do: nil
+  defp user_avatar_url(%{avatar_key: _key} = user), do: Avatar.url(user)
+  defp user_avatar_url(_user), do: nil
 
   defp user_initial(user) do
     user |> user_display_name() |> String.first() |> String.upcase()
