@@ -19,6 +19,7 @@ defmodule Plataforma.Organizations.Membership do
     belongs_to :department_ref, Plataforma.Organizations.Department,
       type: :binary_id,
       foreign_key: :department_id
+    belongs_to :location, Plataforma.Organizations.Location, type: :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -28,7 +29,7 @@ defmodule Plataforma.Organizations.Membership do
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(membership, attrs) do
     membership
-    |> cast(attrs, [:role, :active, :job_title, :department, :employee_code, :department_id])
+    |> cast(attrs, [:role, :active, :job_title, :department, :employee_code, :department_id, :location_id])
     |> trim_optional_fields()
     |> validate_required([:organization_id, :user_id, :role, :active])
     |> validate_length(:job_title, max: 120)
@@ -42,6 +43,7 @@ defmodule Plataforma.Organizations.Membership do
     )
     |> check_constraint(:role, name: :organization_memberships_role_check)
     |> foreign_key_constraint(:department_id)
+    |> foreign_key_constraint(:location_id)
   end
 
   defp trim_optional_fields(changeset) do

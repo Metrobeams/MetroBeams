@@ -23,8 +23,9 @@ defmodule PlataformaWeb.DepartmentController do
     changeset =
       Department.create_changeset(%Department{organization_id: organization.id}, %{})
 
+    locations = Organizations.list_locations(organization.id)
     form = Phoenix.Component.to_form(changeset)
-    render(conn, :new, form: form)
+    render(conn, :new, form: form, locations: locations)
   end
 
   def create(
@@ -47,8 +48,9 @@ defmodule PlataformaWeb.DepartmentController do
   def edit(%{assigns: %{organization: organization}} = conn, %{"id" => id}) do
     department = Organizations.get_department!(organization.id, id)
     changeset = Department.update_changeset(department, %{})
+    locations = Organizations.list_locations(organization.id)
     form = Phoenix.Component.to_form(changeset)
-    render(conn, :edit, department: department, form: form)
+    render(conn, :edit, department: department, form: form, locations: locations)
   end
 
   def update(

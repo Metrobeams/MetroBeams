@@ -26,7 +26,7 @@ defmodule Plataforma.Organizations.Department do
   def create_changeset(department, attrs) do
     department
     |> cast(attrs, [:name, :code, :description, :location_id])
-    |> validate_required([:name])
+    |> validate_required([:name, :location_id])
     |> validate_length(:name, min: 2, max: 120)
     |> validate_length(:code, max: 20)
     |> validate_length(:description, max: 500)
@@ -43,7 +43,7 @@ defmodule Plataforma.Organizations.Department do
   def update_changeset(department, attrs) do
     department
     |> cast(attrs, [:name, :code, :description, :location_id])
-    |> validate_required([:name])
+    |> validate_required([:name, :location_id])
     |> validate_length(:name, min: 2, max: 120)
     |> validate_length(:code, max: 20)
     |> validate_length(:description, max: 500)

@@ -22,7 +22,6 @@
         name="department[name]"
         label="Nome"
         field={@form[:name]}
-        errors={@form[:name].errors}
         placeholder="Ex: Tecnologia da Informação, Recursos Humanos"
         required
         helper_text="Nome do departamento (será convertido para minúsculas)."
@@ -33,9 +32,19 @@
         name="department[code]"
         label="Código"
         field={@form[:code]}
-        errors={@form[:code].errors}
         placeholder="Ex: TI, RH, FIN"
         helper_text="Sigla ou código abreviado do departamento (será convertido para maiúsculas)."
+      />
+
+      <PlataformaWeb.FormComponents.carbon_select
+        id="department_location_id"
+        name="department[location_id]"
+        label="Localização"
+        field={@form[:location_id]}
+        options={Enum.map(@locations, &{&1.name, &1.id})}
+        prompt="Selecione uma localização"
+        required
+        helper_text="Localização física do departamento."
       />
 
       <PlataformaWeb.FormComponents.carbon_textarea
@@ -43,7 +52,6 @@
         name="department[description]"
         label="Descrição"
         field={@form[:description]}
-        errors={@form[:description].errors}
         placeholder="Descreva brevemente o departamento"
         helper_text="Descrição opcional das atividades do departamento."
       />
