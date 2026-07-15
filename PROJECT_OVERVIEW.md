@@ -1,6 +1,6 @@
 # Visão geral da plataforma MetroBeams
 
-> Snapshot técnico em 13 de julho de 2026. A estrutura do PostgreSQL foi
+> Snapshot técnico em 14 de julho de 2026. A estrutura do PostgreSQL foi
 > extraída do banco de desenvolvimento `plataforma_dev`, e os módulos foram
 > catalogados a partir do código-fonte atual.
 
@@ -36,7 +36,7 @@ Serviços auxiliares presentes na plataforma:
 - Oban para processamento assíncrono;
 - MinIO/S3 para armazenamento de arquivos e avatares;
 - ImageMagick para processamento de imagens;
-- Phoenix Components e Tailwind CSS para a interface;
+- Phoenix Components, Tailwind CSS e Carbon Design System para a interface;
 - ExUnit para testes.
 
 ## 2. Funcionalidades já existentes
@@ -59,6 +59,14 @@ Serviços auxiliares presentes na plataforma:
 - rejeição de agentes inativos;
 - proteção contra concorrência no enrollment da mesma máquina;
 - validação de `Content-Type` JSON e redação de dados sensíveis nos logs.
+
+### Interface (Carbon Design System)
+
+- Lead Space Short (320px) na página inicial com wayfinding tag e saudação personalizada;
+- Tiles estáticos sem borda para features (padrão Carbon);
+- Grid de 16 colunas para layout responsivo;
+- Tokens de cor `--carbon-blue-*` para consistência visual;
+- Componentes Phoenix com classes Tailwind alinhadas ao Carbon.
 
 ### Agente Go
 

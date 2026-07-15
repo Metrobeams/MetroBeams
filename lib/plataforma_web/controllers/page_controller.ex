@@ -13,7 +13,8 @@ defmodule PlataformaWeb.PageController do
 
     render(conn, :home,
       organizations: organization_cards,
-      organization_count: length(organization_cards)
+      organization_count: length(organization_cards),
+      user_name: user.name
     )
   end
 

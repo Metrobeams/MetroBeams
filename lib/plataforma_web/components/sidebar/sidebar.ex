@@ -60,6 +60,13 @@ defmodule PlataformaWeb.Sidebar do
           label="Fabricantes"
           active={String.starts_with?(@current_path, "/manufacturers")}
         />
+        <.sidebar_link
+          id="sidebar-suppliers-link"
+          href={~p"/suppliers"}
+          icon="hero-building-storefront"
+          label="Fornecedores"
+          active={String.starts_with?(@current_path, "/suppliers")}
+        />
       </nav>
 
       <nav class="sidebar-navigation border-t border-[#393939] px-3 py-2" aria-label="Configurações">

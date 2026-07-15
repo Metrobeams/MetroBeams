@@ -1,0 +1,121 @@
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_path={@conn.request_path}
+  notification_summary={@notification_summary}
+  content_class="max-w-2xl"
+>
+  <div id="supplier-show" data-design-system="carbon">
+    <div class="mb-8">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
+        Assets
+      </p>
+      <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
+        {@supplier.name}
+      </h1>
+    </div>
+
+    <div class="space-y-6">
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Nome</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">{@supplier.name}</dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Contato</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          {@supplier.contact_name || "Não informado"}
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Email</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          <%= if @supplier.email do %>
+            <.link
+              href={"mailto:#{@supplier.email}"}
+              class="text-[#0f62fe] hover:underline"
+            >
+              {@supplier.email}
+            </.link>
+          <% else %>
+            <span class="text-[#6f6f6f]">Não informado</span>
+          <% end %>
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Telefone</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          {@supplier.phone || "Não informado"}
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Website</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          <%= if @supplier.website do %>
+            <.link
+              href={@supplier.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-[#0f62fe] hover:underline"
+            >
+              {@supplier.website}
+            </.link>
+          <% else %>
+            <span class="text-[#6f6f6f]">Não informado</span>
+          <% end %>
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">CNPJ</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          {@supplier.cnpj || "Não informado"}
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Endereço</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          {@supplier.address || "Não informado"}
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Observações</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          {@supplier.notes || "Não informado"}
+        </dd>
+      </div>
+    </div>
+
+    <div class="mt-8 flex items-center gap-4">
+      <.link
+        href={~p"/suppliers/#{@supplier}/edit"}
+        class="inline-flex items-center justify-center rounded-none border-0 bg-[#0f62fe] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0353e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]"
+      >
+        Editar
+      </.link>
+
+      <.link
+        href={~p"/suppliers"}
+        class="text-sm font-semibold text-[#0f62fe] hover:underline"
+      >
+        Voltar
+      </.link>
+    </div>
+
+    <div class="mt-8 border-t border-[#e0e0e0] pt-6 dark:border-[#525252]">
+      <.link
+        href={~p"/suppliers/#{@supplier}"}
+        method="delete"
+        data-confirm="Desativar este fornecedor?"
+        class="text-sm font-semibold text-[#da1e28] hover:underline"
+      >
+        Desativar Fornecedor
+      </.link>
+    </div>
+  </div>
+</Layouts.app>

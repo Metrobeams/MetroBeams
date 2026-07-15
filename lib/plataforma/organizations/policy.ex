@@ -18,7 +18,8 @@ defmodule Plataforma.Organizations.Policy do
     deactivate_member: [:owner, :admin],
     change_member_role: [:owner],
     manage_categories: [:owner, :admin, :technician],
-    manage_manufacturers: [:owner, :admin, :technician]
+    manage_manufacturers: [:owner, :admin, :technician],
+    manage_suppliers: [:owner, :admin, :technician]
   }
 
   @impl true
