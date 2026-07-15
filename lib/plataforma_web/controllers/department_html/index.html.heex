@@ -52,6 +52,9 @@
                 Código
               </th>
               <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
+                Localização
+              </th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
                 Descrição
               </th>
               <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
@@ -72,6 +75,21 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
                   {department.code || "-"}
+                </td>
+                <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
+                  <%= if department.location do %>
+                    <span class="flex items-center gap-2">
+                      <%= if department.location.tag_color do %>
+                        <span
+                          class="inline-block h-2 w-2 rounded-full"
+                          style={"background-color: #{department.location.tag_color}"}
+                        ></span>
+                      <% end %>
+                      {department.location.name}
+                    </span>
+                  <% else %>
+                    -
+                  <% end %>
                 </td>
                 <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
                   {department.description || "-"}

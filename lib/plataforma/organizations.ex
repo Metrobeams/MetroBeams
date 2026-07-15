@@ -471,6 +471,7 @@ defmodule Plataforma.Organizations do
     Department
     |> where([d], d.organization_id == ^organization_id and d.active)
     |> order_by([d], asc: d.name)
+    |> preload(:location)
     |> Repo.all()
   end
 
