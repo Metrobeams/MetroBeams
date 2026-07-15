@@ -6,70 +6,57 @@
   content_class="max-w-2xl"
 >
   <div id="manufacturer-edit" data-design-system="carbon">
-    <div class="mb-8">
-      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
-        Assets
-      </p>
-      <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
-        Editar Fabricante
-      </h1>
-      <p class="mt-2 text-sm text-[#525252] dark:text-[#c6c6c6]">
-        Atualize as informações do fabricante.
-      </p>
-    </div>
+    <PlataformaWeb.FormComponents.carbon_form_header
+      section="Assets"
+      title="Editar Fabricante"
+      description="Atualize as informações do fabricante."
+    />
 
     <.form
       for={@form}
       action={~p"/manufacturers/#{@manufacturer}"}
-      class="space-y-8"
+      class="space-y-2"
     >
-      <div>
-        <.input
-          field={@form[:name]}
-          type="text"
-          label="Nome"
-          placeholder="Ex: Dell, Lenovo, Apple"
-          required
-        />
-        <p class="mt-1 text-xs text-[#6f6f6f] dark:text-[#a1a1a1]">
-          Nome do fabricante (espaços externos são removidos).
-        </p>
-      </div>
+      <PlataformaWeb.FormComponents.carbon_input
+        id="manufacturer_name"
+        name="manufacturer[name]"
+        label="Nome"
+        field={@form[:name]}
+        errors={@form[:name].errors}
+        placeholder="Ex: Dell, Lenovo, Apple"
+        required
+        helper_text="Nome do fabricante (será convertido para minúsculas)."
+      />
 
-      <.input
-        field={@form[:website]}
-        type="url"
+      <PlataformaWeb.FormComponents.carbon_input
+        id="manufacturer_website"
+        name="manufacturer[website]"
         label="Website"
-        placeholder="https://exemplo.com"
-      />
-
-      <.input
-        field={@form[:support_url]}
         type="url"
-        label="URL de Suporte"
-        placeholder="https://suporte.exemplo.com"
+        field={@form[:website]}
+        errors={@form[:website].errors}
+        placeholder="https://exemplo.com"
+        helper_text="URL oficial do fabricante."
       />
 
-      <div class="flex w-full max-w-[40rem] flex-col gap-4 sm:flex-row sm:justify-end">
-        <.link
-          href={~p"/manufacturers"}
-          data-carbon-button="secondary"
-          class="inline-flex min-h-12 items-center justify-center rounded-none border-0 bg-[#393939] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4c4c4c] active:bg-[#6f6f6f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--carbon-blue-60)] sm:max-w-80"
-        >
-          Cancelar
-        </.link>
+      <PlataformaWeb.FormComponents.carbon_input
+        id="manufacturer_support_url"
+        name="manufacturer[support_url]"
+        label="URL de suporte"
+        type="url"
+        field={@form[:support_url]}
+        errors={@form[:support_url].errors}
+        placeholder="https://suporte.exemplo.com"
+        helper_text="URL da página de suporte do fabricante."
+      />
 
-        <button
-          type="submit"
-          data-carbon-button="primary"
-          class="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-none border-0 bg-[#0f62fe] px-4 py-3 text-sm font-semibold text-white shadow-none transition-colors hover:bg-[#0353e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe] sm:max-w-80"
-        >
-          Salvar Alterações
-        </button>
-      </div>
+      <PlataformaWeb.FormComponents.carbon_form_actions
+        submit_label="Salvar alterações"
+        cancel_path={~p"/manufacturers"}
+      />
     </.form>
 
-    <div class="mt-8 border-t border-[#e0e0e0] pt-6 dark:border-[#525252]">
+    <div class="mt-8">
       <.link
         href={~p"/manufacturers/#{@manufacturer}"}
         method="delete"

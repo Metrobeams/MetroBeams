@@ -6,105 +6,110 @@
   content_class="max-w-2xl"
 >
   <div id="supplier-edit" data-design-system="carbon">
-    <div class="mb-8">
-      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
-        Assets
-      </p>
-      <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
-        Editar Fornecedor
-      </h1>
-      <p class="mt-2 text-sm text-[#525252] dark:text-[#c6c6c6]">
-        Atualize as informações do fornecedor.
-      </p>
-    </div>
+    <PlataformaWeb.FormComponents.carbon_form_header
+      section="Assets"
+      title="Editar Fornecedor"
+      description="Atualize as informações do fornecedor."
+    />
 
     <.form
       for={@form}
       action={~p"/suppliers/#{@supplier}"}
-      class="space-y-8"
+      class="space-y-2"
     >
-      <div>
-        <.input
-          field={@form[:name]}
-          type="text"
-          label="Nome"
-          placeholder="Ex: Dell, HP, Lenovo"
-          required
-        />
-        <p class="mt-1 text-xs text-[#6f6f6f] dark:text-[#a1a1a1]">
-          Nome do fornecedor (espaços externos são removidos).
-        </p>
-      </div>
+      <PlataformaWeb.FormComponents.carbon_input
+        id="supplier_name"
+        name="supplier[name]"
+        label="Nome"
+        field={@form[:name]}
+        errors={@form[:name].errors}
+        placeholder="Ex: Dell, HP, Lenovo"
+        required
+        helper_text="Nome do fornecedor (será convertido para minúsculas)."
+      />
 
-      <.input
+      <PlataformaWeb.FormComponents.carbon_input
+        id="supplier_contact_name"
+        name="supplier[contact_name]"
+        label="Nome do contato"
         field={@form[:contact_name]}
-        type="text"
-        label="Nome do Contato"
+        errors={@form[:contact_name].errors}
         placeholder="Nome da pessoa de contato"
+        helper_text="Nome do responsável pelo atendimento."
       />
 
-      <.input
-        field={@form[:email]}
-        type="email"
-        label="Email"
-        placeholder="contato@exemplo.com"
-      />
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
+        <PlataformaWeb.FormComponents.carbon_input
+          id="supplier_email"
+          name="supplier[email]"
+          label="Email"
+          type="email"
+          field={@form[:email]}
+          errors={@form[:email].errors}
+          placeholder="contato@exemplo.com"
+          helper_text="Email de contato do fornecedor."
+        />
 
-      <.input
-        field={@form[:phone]}
-        type="tel"
-        label="Telefone"
-        placeholder="(11) 99999-9999"
-      />
-
-      <.input
-        field={@form[:website]}
-        type="url"
-        label="Website"
-        placeholder="https://exemplo.com"
-      />
-
-      <.input
-        field={@form[:cnpj]}
-        type="text"
-        label="CNPJ"
-        placeholder="00.000.000/0001-00"
-      />
-
-      <.input
-        field={@form[:address]}
-        type="text"
-        label="Endereço"
-        placeholder="Rua, número, bairro, cidade - UF"
-      />
-
-      <.input
-        field={@form[:notes]}
-        type="textarea"
-        label="Observações"
-        placeholder="Informações adicionais sobre o fornecedor"
-      />
-
-      <div class="flex w-full max-w-[40rem] flex-col gap-4 sm:flex-row sm:justify-end">
-        <.link
-          href={~p"/suppliers"}
-          data-carbon-button="secondary"
-          class="inline-flex min-h-12 items-center justify-center rounded-none border-0 bg-[#393939] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4c4c4c] active:bg-[#6f6f6f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--carbon-blue-60)] sm:max-w-80"
-        >
-          Cancelar
-        </.link>
-
-        <button
-          type="submit"
-          data-carbon-button="primary"
-          class="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-none border-0 bg-[#0f62fe] px-4 py-3 text-sm font-semibold text-white shadow-none transition-colors hover:bg-[#0353e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe] sm:max-w-80"
-        >
-          Salvar Alterações
-        </button>
+        <PlataformaWeb.FormComponents.carbon_input
+          id="supplier_phone"
+          name="supplier[phone]"
+          label="Telefone"
+          type="tel"
+          field={@form[:phone]}
+          errors={@form[:phone].errors}
+          placeholder="(11) 99999-9999"
+          helper_text="Telefone de contato."
+        />
       </div>
+
+      <PlataformaWeb.FormComponents.carbon_input
+        id="supplier_website"
+        name="supplier[website]"
+        label="Website"
+        type="url"
+        field={@form[:website]}
+        errors={@form[:website].errors}
+        placeholder="https://exemplo.com"
+        helper_text="URL oficial do fornecedor."
+      />
+
+      <PlataformaWeb.FormComponents.carbon_input
+        id="supplier_cnpj"
+        name="supplier[cnpj]"
+        label="CNPJ"
+        field={@form[:cnpj]}
+        errors={@form[:cnpj].errors}
+        placeholder="00.000.000/0001-00"
+        helper_text="CNPJ do fornecedor."
+      />
+
+      <PlataformaWeb.FormComponents.carbon_input
+        id="supplier_address"
+        name="supplier[address]"
+        label="Endereço"
+        field={@form[:address]}
+        errors={@form[:address].errors}
+        placeholder="Rua, número, bairro, cidade - UF"
+        helper_text="Endereço completo do fornecedor."
+      />
+
+      <PlataformaWeb.FormComponents.carbon_textarea
+        id="supplier_notes"
+        name="supplier[notes]"
+        label="Observações"
+        field={@form[:notes]}
+        errors={@form[:notes].errors}
+        placeholder="Informações adicionais sobre o fornecedor"
+        helper_text="Notas internas sobre o fornecedor."
+      />
+
+      <PlataformaWeb.FormComponents.carbon_form_actions
+        submit_label="Salvar alterações"
+        cancel_path={~p"/suppliers"}
+      />
     </.form>
 
-    <div class="mt-8 border-t border-[#e0e0e0] pt-6 dark:border-[#525252]">
+    <div class="mt-8">
       <.link
         href={~p"/suppliers/#{@supplier}"}
         method="delete"

@@ -6,67 +6,52 @@
   content_class="max-w-2xl"
 >
   <div id="department-new" data-design-system="carbon">
-    <div class="mb-8">
-      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
-        Organização
-      </p>
-      <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
-        Novo Departamento
-      </h1>
-      <p class="mt-2 text-sm text-[#525252] dark:text-[#c6c6c6]">
-        Cadastre um departamento da organização.
-      </p>
-    </div>
+    <PlataformaWeb.FormComponents.carbon_form_header
+      section="Organização"
+      title="Novo Departamento"
+      description="Cadastre um departamento da organização."
+    />
 
     <.form
       for={@form}
       action={~p"/departments"}
-      class="space-y-8"
+      class="space-y-2"
     >
-      <div>
-        <.input
-          field={@form[:name]}
-          type="text"
-          label="Nome"
-          placeholder="Ex: Tecnologia da Informação, Recursos Humanos"
-          required
-        />
-        <p class="mt-1 text-xs text-[#6f6f6f] dark:text-[#a1a1a1]">
-          Nome do departamento (espaços externos são removidos).
-        </p>
-      </div>
+      <PlataformaWeb.FormComponents.carbon_input
+        id="department_name"
+        name="department[name]"
+        label="Nome"
+        field={@form[:name]}
+        errors={@form[:name].errors}
+        placeholder="Ex: Tecnologia da Informação, Recursos Humanos"
+        required
+        helper_text="Nome do departamento (será convertido para minúsculas)."
+      />
 
-      <.input
-        field={@form[:code]}
-        type="text"
+      <PlataformaWeb.FormComponents.carbon_input
+        id="department_code"
+        name="department[code]"
         label="Código"
+        field={@form[:code]}
+        errors={@form[:code].errors}
         placeholder="Ex: TI, RH, FIN"
+        helper_text="Sigla ou código abreviado do departamento (será convertido para maiúsculas)."
       />
 
-      <.input
-        field={@form[:description]}
-        type="textarea"
+      <PlataformaWeb.FormComponents.carbon_textarea
+        id="department_description"
+        name="department[description]"
         label="Descrição"
-        placeholder="Descrição breve do departamento"
+        field={@form[:description]}
+        errors={@form[:description].errors}
+        placeholder="Descreva brevemente o departamento"
+        helper_text="Descrição opcional das atividades do departamento."
       />
 
-      <div class="flex w-full max-w-[40rem] flex-col gap-4 sm:flex-row sm:justify-end">
-        <.link
-          href={~p"/departments"}
-          data-carbon-button="secondary"
-          class="inline-flex min-h-12 items-center justify-center rounded-none border-0 bg-[#393939] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4c4c4c] active:bg-[#6f6f6f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--carbon-blue-60)] sm:max-w-80"
-        >
-          Cancelar
-        </.link>
-
-        <button
-          type="submit"
-          data-carbon-button="primary"
-          class="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-none border-0 bg-[#0f62fe] px-4 py-3 text-sm font-semibold text-white shadow-none transition-colors hover:bg-[#0353e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe] sm:max-w-80"
-        >
-          Criar departamento
-        </button>
-      </div>
+      <PlataformaWeb.FormComponents.carbon_form_actions
+        submit_label="Criar departamento"
+        cancel_path={~p"/departments"}
+      />
     </.form>
   </div>
 </Layouts.app>
