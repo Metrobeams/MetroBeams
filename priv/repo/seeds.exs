@@ -12,7 +12,7 @@
 
 alias Plataforma.Repo
 alias Plataforma.Accounts.User
-alias Plataforma.Organizations.{Organization, Membership, Department}
+alias Plataforma.Organizations.{Organization, Membership, Department, Location}
 alias Plataforma.Assets.{AssetCategory, Manufacturer, Supplier}
 alias Plataforma.Notifications.Notification
 alias Plataforma.Agents.Agent
@@ -119,8 +119,12 @@ defmodule Seeds do
   end
 
   def get_or_insert_supplier(org_id, name, attrs \\ %{}) do
+    normalized = name |> String.trim() |> String.downcase()
+
     case Repo.one(
-           from(s in Supplier, where: s.organization_id == ^org_id and s.name == ^name)
+           from(s in Supplier,
+             where: s.organization_id == ^org_id and fragment("lower(?)", s.name) == ^normalized
+           )
          ) do
       nil ->
         %Supplier{organization_id: org_id}
@@ -129,6 +133,24 @@ defmodule Seeds do
 
       supplier ->
         supplier
+    end
+  end
+
+  def get_or_insert_location(org_id, name, attrs \\ %{}) do
+    normalized = name |> String.trim() |> String.downcase()
+
+    case Repo.one(
+           from(l in Location,
+             where: l.organization_id == ^org_id and fragment("lower(?)", l.name) == ^normalized
+           )
+         ) do
+      nil ->
+        %Location{organization_id: org_id}
+        |> Location.create_changeset(Map.merge(attrs, %{name: name}))
+        |> Repo.insert!()
+
+      loc ->
+        loc
     end
   end
 
@@ -271,31 +293,68 @@ end
 
 IO.puts("    Manufacturers ready")
 
+# ── Locations ────────────────────────────────────────────────────────────────
+
+IO.puts("  Creating locations...")
+
+locations_org1 = [
+  {"Escritório Central", "#0f62fe", "São Paulo", "SP", "Brasil"},
+  {"Filial Campinas", "#24a148", "Campinas", "SP", "Brasil"},
+  {"Galpão de Manutenção", "#f1c21b", "São Paulo", "SP", "Brasil"}
+]
+
+locations_org2 = [
+  {"Planta Principal", "#0f62fe", "Belo Horizonte", "MG", "Brasil"},
+  {"Centro de Distribuição", "#24a148", "Contagem", "MG", "Brasil"}
+]
+
+locations1 = for {name, color, city, state, country} <- locations_org1 do
+  Seeds.get_or_insert_location(org1.id, name, %{
+    tag_color: color,
+    city: city,
+    state: state,
+    country: country
+  })
+end
+
+locations2 = for {name, color, city, state, country} <- locations_org2 do
+  Seeds.get_or_insert_location(org2.id, name, %{
+    tag_color: color,
+    city: city,
+    state: state,
+    country: country
+  })
+end
+
+IO.puts("    Locations ready")
+
 # ── Departments ───────────────────────────────────────────────────────────────
 
 IO.puts("  Creating departments...")
 
 departments_org1 = [
-  {"Tecnologia da Informação", "TI", "Departamento de sistemas e infraestrutura"},
-  {"Manutenção", "MNT", "Manutenção preventiva e corretiva"},
-  {"Operações", "OPR", "Operações gerais da empresa"},
-  {"Recursos Humanos", "RH", "Gestão de pessoas"},
-  {"Financeiro", "FIN", "Departamento financeiro"}
+  {"Tecnologia da Informação", "TI", "Departamento de sistemas e infraestrutura", 0},
+  {"Manutenção", "MNT", "Manutenção preventiva e corretiva", 2},
+  {"Operações", "OPR", "Operações gerais da empresa", 0},
+  {"Recursos Humanos", "RH", "Gestão de pessoas", 0},
+  {"Financeiro", "FIN", "Departamento financeiro", 0}
 ]
 
 departments_org2 = [
-  {"Engenharia", "ENG", "Engenharia de produção e manutenção"},
-  {"Produção", "PRD", "Linha de produção"},
-  {"Qualidade", "QUA", "Controle de qualidade"},
-  {"Administração", "ADM", "Administração geral"}
+  {"Engenharia", "ENG", "Engenharia de produção e manutenção", 0},
+  {"Produção", "PRD", "Linha de produção", 0},
+  {"Qualidade", "QUA", "Controle de qualidade", 0},
+  {"Administração", "ADM", "Administração geral", 0}
 ]
 
-for {name, code, desc} <- departments_org1 do
-  Seeds.get_or_insert_department(org1.id, name, %{code: code, description: desc})
+for {name, code, desc, loc_idx} <- departments_org1 do
+  location_id = Enum.at(locations1, loc_idx) |> then(& &1.id)
+  Seeds.get_or_insert_department(org1.id, name, %{code: code, description: desc, location_id: location_id})
 end
 
-for {name, code, desc} <- departments_org2 do
-  Seeds.get_or_insert_department(org2.id, name, %{code: code, description: desc})
+for {name, code, desc, loc_idx} <- departments_org2 do
+  location_id = Enum.at(locations2, loc_idx) |> then(& &1.id)
+  Seeds.get_or_insert_department(org2.id, name, %{code: code, description: desc, location_id: location_id})
 end
 
 IO.puts("    Departments ready")
