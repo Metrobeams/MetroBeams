@@ -5,108 +5,213 @@
   notification_summary={@notification_summary}
   content_class="max-w-6xl"
 >
-  <div id="departments-index" data-design-system="carbon">
-    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
-          Organização
-        </p>
-        <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4]">
-          Departamentos
-        </h1>
-      </div>
-
-      <.link
-        href={~p"/departments/new"}
-        class="inline-flex items-center justify-center rounded-none border-0 bg-[#0f62fe] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0353e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]"
-      >
-        Novo Departamento
-      </.link>
-    </div>
-
-    <%= if Enum.empty?(@departments) do %>
-      <div
-        id="departments-empty"
-        class="border border-[#e0e0e0] bg-white px-6 py-12 text-center dark:border-[#525252] dark:bg-[#262626]"
-      >
-        <.icon name="hero-building-office" class="mx-auto size-8 text-[#8d8d8d]" />
-        <p class="mt-4 text-sm text-[#525252] dark:text-[#c6c6c6]">
-          Nenhum departamento cadastrado.
-        </p>
-        <.link
-          href={~p"/departments/new"}
-          class="mt-4 inline-block text-sm font-semibold text-[#0f62fe] hover:underline"
-        >
-          Criar primeiro departamento
-        </.link>
-      </div>
-    <% else %>
-      <div class="border border-[#e0e0e0] bg-white dark:border-[#525252] dark:bg-[#262626]">
-        <table class="w-full">
-          <thead>
-            <tr class="border-b border-[#e0e0e0] dark:border-[#525252]">
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
-                Nome
-              </th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
-                Código
-              </th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
-                Localização
-              </th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
-                Descrição
-              </th>
-              <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
-                Ações
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[#e0e0e0] dark:divide-[#525252]">
-            <%= for department <- @departments do %>
-              <tr class="hover:bg-[#f4f4f4] dark:hover:bg-[#393939]">
-                <td class="px-4 py-3 text-sm font-medium text-[#161616] dark:text-[#f4f4f4]">
-                  <.link
-                    href={~p"/departments/#{department}"}
-                    class="text-[#0f62fe] hover:underline"
-                  >
-                    {department.name}
-                  </.link>
-                </td>
-                <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
-                  {department.code || "-"}
-                </td>
-                <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
-                  <%= if department.location do %>
-                    <span class="flex items-center gap-2">
-                      <%= if department.location.tag_color do %>
-                        <span
-                          class="inline-block h-2 w-2 rounded-full"
-                          style={"background-color: #{department.location.tag_color}"}
-                        ></span>
-                      <% end %>
-                      {department.location.name}
-                    </span>
-                  <% else %>
-                    -
-                  <% end %>
-                </td>
-                <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
-                  {department.description || "-"}
-                </td>
-                <td class="px-4 py-3 text-right">
-                  <.link
-                    href={~p"/departments/#{department}/edit"}
-                    class="text-xs font-semibold text-[#0f62fe] hover:underline"
-                  >
-                    Editar
-                  </.link>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% end %>
+  <div class="mb-4">
+    <h2 class="text-xl font-semibold text-[#161616] dark:text-[#f4f4f4]">
+      Departamentos
+    </h2>
+    <p class="mt-1 text-sm text-[#525252] dark:text-[#c6c6c6]">
+      Gerencie os departamentos da organização
+    </p>
   </div>
+
+  <%!-- Toolbar --%>
+  <div class="flex items-center justify-between border-b border-[#e0e0e0] bg-[#f4f4f4] px-4 py-3 dark:border-[#525252] dark:bg-[#393939]">
+    <div></div>
+    <.link
+      href={~p"/departments/new"}
+      class="inline-flex items-center justify-center rounded-none bg-[#0f62fe] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0353e9]"
+    >
+      Novo Departamento
+    </.link>
+  </div>
+
+  <%!-- Table --%>
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse">
+      <thead>
+        <tr class="border-b border-[#e0e0e0] bg-[#f4f4f4] dark:border-[#525252] dark:bg-[#393939]">
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
+            <button
+              type="button"
+              class="flex items-center gap-1 hover:text-[#161616] dark:hover:text-[#f4f4f4]"
+              phx-click="sort"
+              phx-value-field="name"
+            >
+              Nome
+              <span class="flex flex-col">
+                <.icon
+                  name="hero-chevron-up"
+                  class={[
+                    "size-3",
+                    @sort_by == "name" and @sort_dir == :asc && "text-[#0f62fe]",
+                    @sort_by != "name" && "text-[#c6c6c6]"
+                  ]}
+                />
+                <.icon
+                  name="hero-chevron-down"
+                  class={[
+                    "size-3 -mt-1",
+                    @sort_by == "name" and @sort_dir == :desc && "text-[#0f62fe]",
+                    @sort_by != "name" && "text-[#c6c6c6]"
+                  ]}
+                />
+              </span>
+            </button>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
+            <button
+              type="button"
+              class="flex items-center gap-1 hover:text-[#161616] dark:hover:text-[#f4f4f4]"
+              phx-click="sort"
+              phx-value-field="code"
+            >
+              Código
+              <span class="flex flex-col">
+                <.icon
+                  name="hero-chevron-up"
+                  class={[
+                    "size-3",
+                    @sort_by == "code" and @sort_dir == :asc && "text-[#0f62fe]",
+                    @sort_by != "code" && "text-[#c6c6c6]"
+                  ]}
+                />
+                <.icon
+                  name="hero-chevron-down"
+                  class={[
+                    "size-3 -mt-1",
+                    @sort_by == "code" and @sort_dir == :desc && "text-[#0f62fe]",
+                    @sort_by != "code" && "text-[#c6c6c6]"
+                  ]}
+                />
+              </span>
+            </button>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
+            Localização
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
+            Descrição
+          </th>
+          <th class="w-20 px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">
+            Ações
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#e0e0e0] dark:divide-[#525252]">
+        <%= if Enum.empty?(@departments) do %>
+          <tr>
+            <td colspan="5" class="px-4 py-12 text-center">
+              <.icon name="hero-building-office" class="mx-auto size-8 text-[#8d8d8d]" />
+              <p class="mt-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
+                Nenhum departamento cadastrado.
+              </p>
+              <.link
+                href={~p"/departments/new"}
+                class="mt-3 inline-block text-sm font-semibold text-[#0f62fe] hover:underline"
+              >
+                Criar primeiro departamento
+              </.link>
+            </td>
+          </tr>
+        <% else %>
+          <%= for department <- @departments, index <- 0..(length(@departments) - 1) do %>
+            <tr
+              class={[
+                "hover:bg-[#f4f4f4] dark:hover:bg-[#393939] transition-colors",
+                rem(index, 2) == 1 && "bg-[#f4f4f4] dark:bg-[#262626]"
+              ]}
+            >
+              <td class="px-4 py-3 text-sm">
+                <.link
+                  href={~p"/departments/#{department}"}
+                  class="text-[#0f62fe] hover:underline font-medium"
+                >
+                  {department.name}
+                </.link>
+              </td>
+              <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
+                {department.code || "-"}
+              </td>
+              <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6]">
+                <%= if department.location do %>
+                  <span class="flex items-center gap-2">
+                    <%= if department.location.tag_color do %>
+                      <span
+                        class="inline-block h-2 w-2 rounded-full shrink-0"
+                        style={"background-color: #{department.location.tag_color}"}
+                      ></span>
+                    <% end %>
+                    {department.location.name}
+                  </span>
+                <% else %>
+                  -
+                <% end %>
+              </td>
+              <td class="px-4 py-3 text-sm text-[#525252] dark:text-[#c6c6c6] max-w-[200px] truncate">
+                {department.description || "-"}
+              </td>
+              <td class="px-4 py-3 text-right">
+                <.link
+                  href={~p"/departments/#{department}/edit"}
+                  class="text-xs font-semibold text-[#0f62fe] hover:underline"
+                >
+                  Editar
+                </.link>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%!-- Pagination --%>
+  <%= if @total_count > @page_size do %>
+    <div class="flex items-center justify-between border-t border-[#e0e0e0] bg-[#f4f4f4] px-4 py-3 dark:border-[#525252] dark:bg-[#393939]">
+      <span class="text-xs text-[#6f6f6f]">
+        Mostrando {(@page - 1) * @page_size + 1} a {min(@page * @page_size, @total_count)} de {@total_count} registros
+      </span>
+      <div class="flex items-center gap-1">
+        <button
+          type="button"
+          disabled={@page <= 1}
+          phx-click="page"
+          phx-value-page={@page - 1}
+          class="inline-flex items-center justify-center h-8 w-8 rounded-none border border-[#393939] bg-transparent text-[#161616] hover:bg-[#f4f4f4] disabled:cursor-not-allowed disabled:opacity-50 dark:text-[#f4f4f4] dark:hover:bg-[#393939]"
+        >
+          <.icon name="hero-chevron-left" class="size-4" />
+        </button>
+
+        <%= for p <- 1..max(ceil(@total_count / @page_size), 1) do %>
+          <%= if p == @page do %>
+            <button
+              type="button"
+              class="inline-flex items-center justify-center h-8 w-8 rounded-none bg-[#0f62fe] text-sm font-semibold text-white"
+            >
+              {p}
+            </button>
+          <% else %>
+            <button
+              type="button"
+              phx-click="page"
+              phx-value-page={p}
+              class="inline-flex items-center justify-center h-8 w-8 rounded-none border border-[#393939] bg-transparent text-sm text-[#161616] hover:bg-[#f4f4f4] dark:text-[#f4f4f4] dark:hover:bg-[#393939]"
+            >
+              {p}
+            </button>
+          <% end %>
+        <% end %>
+
+        <button
+          type="button"
+          disabled={@page >= max(ceil(@total_count / @page_size), 1)}
+          phx-click="page"
+          phx-value-page={@page + 1}
+          class="inline-flex items-center justify-center h-8 w-8 rounded-none border border-[#393939] bg-transparent text-[#161616] hover:bg-[#f4f4f4] disabled:cursor-not-allowed disabled:opacity-50 dark:text-[#f4f4f4] dark:hover:bg-[#393939]"
+        >
+          <.icon name="hero-chevron-right" class="size-4" />
+        </button>
+      </div>
+    </div>
+  <% end %>
 </Layouts.app>

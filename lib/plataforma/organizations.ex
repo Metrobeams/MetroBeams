@@ -476,6 +476,33 @@ defmodule Plataforma.Organizations do
   end
 
   @doc """
+  Returns paginated list of departments with sorting.
+  """
+  @spec list_departments_paginated(String.t(), keyword()) :: {[Department.t()], integer()}
+  def list_departments_paginated(organization_id, opts \\ []) do
+    page = Keyword.get(opts, :page, 1)
+    page_size = Keyword.get(opts, :page_size, 10)
+    sort_by = Keyword.get(opts, :sort_by, "name")
+    sort_dir = Keyword.get(opts, :sort_dir, :asc)
+
+    base_query =
+      Department
+      |> where([d], d.organization_id == ^organization_id and d.active)
+      |> preload(:location)
+
+    total_count = Repo.aggregate(base_query, :count)
+
+    departments =
+      base_query
+      |> order_by([d], [{^sort_dir, field(d, ^String.to_existing_atom(sort_by))}])
+      |> offset(^(page - 1) * ^page_size)
+      |> limit(^page_size)
+      |> Repo.all()
+
+    {departments, total_count}
+  end
+
+  @doc """
   Gets a single department.
 
   Raises `Ecto.NoResultsError` if the Department does not exist,

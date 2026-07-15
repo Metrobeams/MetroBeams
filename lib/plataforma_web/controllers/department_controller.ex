@@ -9,9 +9,28 @@ defmodule PlataformaWeb.DepartmentController do
 
   plug :require_organization
 
-  def index(%{assigns: %{organization: organization}} = conn, _params) do
-    departments = Organizations.list_departments(organization.id)
-    render(conn, :index, departments: departments)
+  def index(%{assigns: %{organization: organization}} = conn, params) do
+    page = Map.get(params, "page", "1") |> String.to_integer() |> max(1)
+    page_size = 10
+    sort_by = Map.get(params, "sort_by", "name")
+    sort_dir = Map.get(params, "sort_dir", "asc") |> String.to_existing_atom()
+
+    {departments, total_count} = Organizations.list_departments_paginated(
+      organization.id,
+      page: page,
+      page_size: page_size,
+      sort_by: sort_by,
+      sort_dir: sort_dir
+    )
+
+    render(conn, :index,
+      departments: departments,
+      page: page,
+      page_size: page_size,
+      total_count: total_count,
+      sort_by: sort_by,
+      sort_dir: sort_dir
+    )
   end
 
   def show(%{assigns: %{organization: organization}} = conn, %{"id" => id}) do
