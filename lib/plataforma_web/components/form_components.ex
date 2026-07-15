@@ -10,7 +10,6 @@ defmodule PlataformaWeb.FormComponents do
   attr :id, :any, required: true
   attr :name, :any, required: true
   attr :label, :string, required: true
-  attr :value, :any
   attr :type, :string, default: "text"
   attr :field, Phoenix.HTML.FormField, required: true
   attr :errors, :list, default: []
@@ -21,6 +20,13 @@ defmodule PlataformaWeb.FormComponents do
   attr :rest, :global, include: ~w(autocomplete min max step pattern maxlength minlength)
 
   def carbon_input(assigns) do
+    value = Phoenix.HTML.Form.input_value(assigns.field.form, assigns.field.field)
+
+    assigns =
+      assigns
+      |> assign(:value, value)
+      |> assign_new(:errors, fn -> assigns.field.errors end)
+
     ~H"""
     <div class="mb-8">
       <label
@@ -76,7 +82,6 @@ defmodule PlataformaWeb.FormComponents do
   attr :id, :any, required: true
   attr :name, :any, required: true
   attr :label, :string, required: true
-  attr :value, :any
   attr :field, Phoenix.HTML.FormField, required: true
   attr :errors, :list, default: []
   attr :helper_text, :string, default: nil
@@ -87,6 +92,13 @@ defmodule PlataformaWeb.FormComponents do
   attr :rest, :global, include: ~w(maxlength minlength)
 
   def carbon_textarea(assigns) do
+    value = Phoenix.HTML.Form.input_value(assigns.field.form, assigns.field.field)
+
+    assigns =
+      assigns
+      |> assign(:value, value)
+      |> assign_new(:errors, fn -> assigns.field.errors end)
+
     ~H"""
     <div class="mb-8">
       <label
@@ -141,7 +153,6 @@ defmodule PlataformaWeb.FormComponents do
   attr :id, :any, required: true
   attr :name, :any, required: true
   attr :label, :string, required: true
-  attr :value, :any
   attr :field, Phoenix.HTML.FormField, required: true
   attr :errors, :list, default: []
   attr :helper_text, :string, default: nil
@@ -152,6 +163,13 @@ defmodule PlataformaWeb.FormComponents do
   attr :rest, :global
 
   def carbon_select(assigns) do
+    value = Phoenix.HTML.Form.input_value(assigns.field.form, assigns.field.field)
+
+    assigns =
+      assigns
+      |> assign(:value, value)
+      |> assign_new(:errors, fn -> assigns.field.errors end)
+
     ~H"""
     <div class="mb-8">
       <label
