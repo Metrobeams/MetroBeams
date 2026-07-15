@@ -1,6 +1,6 @@
 defmodule Plataforma.Organizations do
   @moduledoc """
-  Context for managing organizations, memberships, and invitations.
+  Context for managing organizations, memberships, invitations, and departments.
   """
 
   import Ecto.Query
@@ -9,6 +9,7 @@ defmodule Plataforma.Organizations do
   alias Plataforma.Organizations.Membership
   alias Plataforma.Organizations.Invitation
   alias Plataforma.Organizations.Organization
+  alias Plataforma.Organizations.Department
   alias Plataforma.Organizations.Policy
   alias Plataforma.Organizations.Workers.SendInvitationEmail
   alias Plataforma.{Accounts, Notifications}
@@ -458,4 +459,79 @@ defmodule Plataforma.Organizations do
   end
 
   defp reload_actor(_actor), do: {:error, :unauthorized}
+
+  # Departments
+
+  @doc """
+  Returns the list of active departments for an organization.
+  """
+  @spec list_departments(String.t()) :: [Department.t()]
+  def list_departments(organization_id) do
+    Department
+    |> where([d], d.organization_id == ^organization_id and d.active)
+    |> order_by([d], asc: d.name)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets a single department.
+
+  Raises `Ecto.NoResultsError` if the Department does not exist,
+  belongs to a different organization, or is inactive.
+  """
+  @spec get_department!(String.t(), String.t()) :: Department.t()
+  def get_department!(organization_id, id) do
+    Department
+    |> where([d], d.id == ^id and d.organization_id == ^organization_id and d.active)
+    |> Repo.one!()
+  end
+
+  @doc """
+  Creates a department.
+  """
+  @spec create_department(String.t(), map()) ::
+          {:ok, Department.t()} | {:error, Ecto.Changeset.t()}
+  def create_department(organization_id, attrs) do
+    %Department{organization_id: organization_id}
+    |> Department.create_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a department.
+  """
+  @spec update_department(String.t(), Department.t(), map()) ::
+          {:ok, Department.t()} | {:error, Ecto.Changeset.t()}
+  def update_department(organization_id, %Department{} = department, attrs) do
+    if department.organization_id != organization_id do
+      raise ArgumentError, "Department does not belong to this organization"
+    end
+
+    department
+    |> Department.update_changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deactivates a department (soft delete).
+  """
+  @spec deactivate_department(String.t(), Department.t()) ::
+          {:ok, Department.t()}
+  def deactivate_department(organization_id, %Department{} = department) do
+    if department.organization_id != organization_id do
+      raise ArgumentError, "Department does not belong to this organization"
+    end
+
+    department
+    |> Department.deactivate_changeset()
+    |> Repo.update()
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking department changes.
+  """
+  @spec change_department(Department.t()) :: Ecto.Changeset.t()
+  def change_department(%Department{} = department) do
+    Department.create_changeset(department, %{})
+  end
 end

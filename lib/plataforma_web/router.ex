@@ -97,6 +97,7 @@ defmodule PlataformaWeb.Router do
     resources "/asset-categories", AssetCategoryController
     resources "/manufacturers", ManufacturerController
     resources "/suppliers", SupplierController
+    resources "/departments", DepartmentController
   end
 
   scope "/", PlataformaWeb do
