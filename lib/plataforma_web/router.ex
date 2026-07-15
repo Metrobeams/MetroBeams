@@ -98,6 +98,7 @@ defmodule PlataformaWeb.Router do
     resources "/manufacturers", ManufacturerController
     resources "/suppliers", SupplierController
     resources "/departments", DepartmentController
+    resources "/locations", LocationController
   end
 
   scope "/", PlataformaWeb do

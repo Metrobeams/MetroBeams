@@ -20,7 +20,8 @@ defmodule Plataforma.Organizations.Policy do
     manage_categories: [:owner, :admin, :technician],
     manage_manufacturers: [:owner, :admin, :technician],
     manage_suppliers: [:owner, :admin, :technician],
-    manage_departments: [:owner, :admin]
+    manage_departments: [:owner, :admin],
+    manage_locations: [:owner, :admin]
   }
 
   @impl true

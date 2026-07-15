@@ -1,6 +1,6 @@
 defmodule Plataforma.Organizations do
   @moduledoc """
-  Context for managing organizations, memberships, invitations, and departments.
+  Context for managing organizations, memberships, invitations, departments, and locations.
   """
 
   import Ecto.Query
@@ -10,6 +10,7 @@ defmodule Plataforma.Organizations do
   alias Plataforma.Organizations.Invitation
   alias Plataforma.Organizations.Organization
   alias Plataforma.Organizations.Department
+  alias Plataforma.Organizations.Location
   alias Plataforma.Organizations.Policy
   alias Plataforma.Organizations.Workers.SendInvitationEmail
   alias Plataforma.{Accounts, Notifications}
@@ -533,5 +534,80 @@ defmodule Plataforma.Organizations do
   @spec change_department(Department.t()) :: Ecto.Changeset.t()
   def change_department(%Department{} = department) do
     Department.create_changeset(department, %{})
+  end
+
+  # Locations
+
+  @doc """
+  Returns the list of active locations for an organization.
+  """
+  @spec list_locations(String.t()) :: [Location.t()]
+  def list_locations(organization_id) do
+    Location
+    |> where([l], l.organization_id == ^organization_id and l.active)
+    |> order_by([l], asc: l.name)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets a single location.
+
+  Raises `Ecto.NoResultsError` if the Location does not exist,
+  belongs to a different organization, or is inactive.
+  """
+  @spec get_location!(String.t(), String.t()) :: Location.t()
+  def get_location!(organization_id, id) do
+    Location
+    |> where([l], l.id == ^id and l.organization_id == ^organization_id and l.active)
+    |> Repo.one!()
+  end
+
+  @doc """
+  Creates a location.
+  """
+  @spec create_location(String.t(), map()) ::
+          {:ok, Location.t()} | {:error, Ecto.Changeset.t()}
+  def create_location(organization_id, attrs) do
+    %Location{organization_id: organization_id}
+    |> Location.create_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a location.
+  """
+  @spec update_location(String.t(), Location.t(), map()) ::
+          {:ok, Location.t()} | {:error, Ecto.Changeset.t()}
+  def update_location(organization_id, %Location{} = location, attrs) do
+    if location.organization_id != organization_id do
+      raise ArgumentError, "Location does not belong to this organization"
+    end
+
+    location
+    |> Location.update_changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deactivates a location (soft delete).
+  """
+  @spec deactivate_location(String.t(), Location.t()) ::
+          {:ok, Location.t()}
+  def deactivate_location(organization_id, %Location{} = location) do
+    if location.organization_id != organization_id do
+      raise ArgumentError, "Location does not belong to this organization"
+    end
+
+    location
+    |> Location.deactivate_changeset()
+    |> Repo.update()
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking location changes.
+  """
+  @spec change_location(Location.t()) :: Ecto.Changeset.t()
+  def change_location(%Location{} = location) do
+    Location.create_changeset(location, %{})
   end
 end

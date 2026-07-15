@@ -1,4 +1,4 @@
-defmodule Plataforma.Organizations.Department do
+defmodule Plataforma.Organizations.Location do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,66 +7,68 @@ defmodule Plataforma.Organizations.Department do
 
   @type t :: %__MODULE__{}
 
-  schema "departments" do
+  schema "locations" do
     field :name, :string
-    field :code, :string
-    field :description, :string
+    field :tag_color, :string
+    field :city, :string
+    field :state, :string
+    field :country, :string
     field :active, :boolean, default: true
 
     belongs_to :organization, Plataforma.Organizations.Organization, type: :binary_id
-    belongs_to :location, Plataforma.Organizations.Location, type: :binary_id
 
-    has_many :memberships, Plataforma.Organizations.Membership
+    has_many :departments, Plataforma.Organizations.Department
 
     timestamps(type: :utc_datetime_usec)
   end
 
   @doc false
   @spec create_changeset(t(), map()) :: Ecto.Changeset.t()
-  def create_changeset(department, attrs) do
-    department
-    |> cast(attrs, [:name, :code, :description, :location_id])
+  def create_changeset(location, attrs) do
+    location
+    |> cast(attrs, [:name, :tag_color, :city, :state, :country])
     |> validate_required([:name])
     |> validate_length(:name, min: 2, max: 120)
-    |> validate_length(:code, max: 20)
-    |> validate_length(:description, max: 500)
+    |> validate_length(:tag_color, max: 7)
+    |> validate_length(:city, max: 100)
+    |> validate_length(:state, max: 100)
+    |> validate_length(:country, max: 100)
     |> normalize_fields()
     |> unique_constraint(:name,
-      name: :departments_active_name_index,
-      message: "já existe um departamento com este nome nesta organização"
+      name: :locations_active_name_index,
+      message: "já existe uma localização com este nome nesta organização"
     )
-    |> foreign_key_constraint(:location_id)
   end
 
   @doc false
   @spec update_changeset(t(), map()) :: Ecto.Changeset.t()
-  def update_changeset(department, attrs) do
-    department
-    |> cast(attrs, [:name, :code, :description, :location_id])
+  def update_changeset(location, attrs) do
+    location
+    |> cast(attrs, [:name, :tag_color, :city, :state, :country])
     |> validate_required([:name])
     |> validate_length(:name, min: 2, max: 120)
-    |> validate_length(:code, max: 20)
-    |> validate_length(:description, max: 500)
+    |> validate_length(:tag_color, max: 7)
+    |> validate_length(:city, max: 100)
+    |> validate_length(:state, max: 100)
+    |> validate_length(:country, max: 100)
     |> normalize_fields()
     |> unique_constraint(:name,
-      name: :departments_active_name_index,
-      message: "já existe um departamento com este nome nesta organização"
+      name: :locations_active_name_index,
+      message: "já existe uma localização com este nome nesta organização"
     )
-    |> foreign_key_constraint(:location_id)
   end
 
   @doc false
   @spec deactivate_changeset(t()) :: Ecto.Changeset.t()
-  def deactivate_changeset(department) do
-    department
+  def deactivate_changeset(location) do
+    location
     |> change(active: false)
   end
 
   defp normalize_fields(changeset) do
     changeset
     |> normalize_name()
-    |> normalize_code()
-    |> normalize_empty_strings([:description])
+    |> normalize_empty_strings([:tag_color, :city, :state, :country])
   end
 
   defp normalize_name(changeset) do
@@ -77,17 +79,6 @@ defmodule Plataforma.Organizations.Department do
       name ->
         normalized = name |> String.trim() |> String.downcase()
         put_change(changeset, :name, normalized)
-    end
-  end
-
-  defp normalize_code(changeset) do
-    case get_change(changeset, :code) do
-      nil ->
-        changeset
-
-      code ->
-        normalized = code |> String.trim() |> String.upcase()
-        put_change(changeset, :code, normalized)
     end
   end
 

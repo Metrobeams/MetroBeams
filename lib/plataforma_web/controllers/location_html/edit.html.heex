@@ -1,0 +1,86 @@
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_path={@conn.request_path}
+  notification_summary={@notification_summary}
+  content_class="max-w-2xl"
+>
+  <div id="location-edit" data-design-system="carbon">
+    <PlataformaWeb.FormComponents.carbon_form_header
+      section="Organização"
+      title="Editar Localização"
+      description="Atualize as informações da localização."
+    />
+
+    <.form
+      for={@form}
+      action={~p"/locations/#{@location}"}
+      class="space-y-2"
+    >
+      <PlataformaWeb.FormComponents.carbon_input
+        id="location_name"
+        name="location[name]"
+        label="Nome"
+        field={@form[:name]}
+        placeholder="Ex: Filial São Paulo, Escritório Central"
+        required
+        helper_text="Nome da localização (será convertido para minúsculas)."
+      />
+
+      <PlataformaWeb.FormComponents.carbon_input
+        id="location_tag_color"
+        name="location[tag_color]"
+        label="Cor da tag"
+        type="color"
+        field={@form[:tag_color]}
+        placeholder="#0f62fe"
+        helper_text="Cor hexadecimal para identificação visual (ex: #0f62fe)."
+      />
+
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
+        <PlataformaWeb.FormComponents.carbon_input
+          id="location_city"
+          name="location[city]"
+          label="Cidade"
+          field={@form[:city]}
+          placeholder="Ex: São Paulo"
+          helper_text="Cidade onde está localizado."
+        />
+
+        <PlataformaWeb.FormComponents.carbon_input
+          id="location_state"
+          name="location[state]"
+          label="Estado"
+          field={@form[:state]}
+          placeholder="Ex: SP"
+          helper_text="Estado ou província."
+        />
+      </div>
+
+      <PlataformaWeb.FormComponents.carbon_input
+        id="location_country"
+        name="location[country]"
+        label="País"
+        field={@form[:country]}
+        placeholder="Ex: Brasil"
+        helper_text="País da localização."
+      />
+
+      <PlataformaWeb.FormComponents.carbon_form_actions
+        submit_label="Salvar alterações"
+        cancel_path={~p"/locations"}
+      />
+    </.form>
+
+    <div class="mt-8">
+      <.link
+        href={~p"/locations/#{@location}"}
+        method="delete"
+        data-confirm="Desativar esta localização?"
+        class="text-sm font-semibold text-[#da1e28] hover:underline"
+      >
+        Desativar Localização
+      </.link>
+    </div>
+  </div>
+</Layouts.app>

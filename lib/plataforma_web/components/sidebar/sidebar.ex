@@ -74,6 +74,13 @@ defmodule PlataformaWeb.Sidebar do
           label="Departamentos"
           active={String.starts_with?(@current_path, "/departments")}
         />
+        <.sidebar_link
+          id="sidebar-locations-link"
+          href={~p"/locations"}
+          icon="hero-map-pin"
+          label="Localizações"
+          active={String.starts_with?(@current_path, "/locations")}
+        />
       </nav>
 
       <nav class="sidebar-navigation border-t border-[#393939] px-3 py-2" aria-label="Configurações">

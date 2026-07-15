@@ -1,0 +1,96 @@
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_path={@conn.request_path}
+  notification_summary={@notification_summary}
+  content_class="max-w-2xl"
+>
+  <div id="location-show" data-design-system="carbon">
+    <div class="mb-8">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f62fe]">
+        Organização
+      </p>
+      <h1 class="mt-2 text-3xl font-light tracking-tight text-[#161616] dark:text-[#f4f4f4] flex items-center gap-3">
+        <%= if @location.tag_color do %>
+          <span
+            class="inline-block h-4 w-4 rounded-full"
+            style={"background-color: #{@location.tag_color}"}
+          ></span>
+        <% end %>
+        {@location.name}
+      </h1>
+    </div>
+
+    <div class="space-y-6">
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Nome</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">{@location.name}</dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Cor da tag</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          <%= if @location.tag_color do %>
+            <span class="flex items-center gap-2">
+              <span
+                class="inline-block h-4 w-4 rounded-full"
+                style={"background-color: #{@location.tag_color}"}
+              ></span>
+              {@location.tag_color}
+            </span>
+          <% else %>
+            <span class="text-[#6f6f6f]">Não informado</span>
+          <% end %>
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Cidade</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          {@location.city || "Não informado"}
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">Estado</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          {@location.state || "Não informado"}
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-xs font-semibold uppercase tracking-wider text-[#6f6f6f]">País</dt>
+        <dd class="mt-1 text-sm text-[#161616] dark:text-[#f4f4f4]">
+          {@location.country || "Não informado"}
+        </dd>
+      </div>
+    </div>
+
+    <div class="mt-8 flex items-center gap-4">
+      <.link
+        href={~p"/locations/#{@location}/edit"}
+        class="inline-flex items-center justify-center rounded-none border-0 bg-[#0f62fe] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0353e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f62fe]"
+      >
+        Editar
+      </.link>
+
+      <.link
+        href={~p"/locations"}
+        class="text-sm font-semibold text-[#0f62fe] hover:underline"
+      >
+        Voltar
+      </.link>
+    </div>
+
+    <div class="mt-8 border-t border-[#e0e0e0] pt-6 dark:border-[#525252]">
+      <.link
+        href={~p"/locations/#{@location}"}
+        method="delete"
+        data-confirm="Desativar esta localização?"
+        class="text-sm font-semibold text-[#da1e28] hover:underline"
+      >
+        Desativar Localização
+      </.link>
+    </div>
+  </div>
+</Layouts.app>
