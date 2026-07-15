@@ -12,8 +12,8 @@
 
 alias Plataforma.Repo
 alias Plataforma.Accounts.User
-alias Plataforma.Organizations.{Organization, Membership}
-alias Plataforma.Assets.{AssetCategory, Manufacturer}
+alias Plataforma.Organizations.{Organization, Membership, Department}
+alias Plataforma.Assets.{AssetCategory, Manufacturer, Supplier}
 alias Plataforma.Notifications.Notification
 alias Plataforma.Agents.Agent
 
@@ -97,6 +97,38 @@ defmodule Seeds do
 
       mfr ->
         mfr
+    end
+  end
+
+  def get_or_insert_department(org_id, name, attrs \\ %{}) do
+    normalized = name |> String.trim() |> String.downcase()
+
+    case Repo.one(
+           from(d in Department,
+             where: d.organization_id == ^org_id and fragment("lower(?)", d.name) == ^normalized
+           )
+         ) do
+      nil ->
+        %Department{organization_id: org_id}
+        |> Department.create_changeset(Map.merge(attrs, %{name: name}))
+        |> Repo.insert!()
+
+      dept ->
+        dept
+    end
+  end
+
+  def get_or_insert_supplier(org_id, name, attrs \\ %{}) do
+    case Repo.one(
+           from(s in Supplier, where: s.organization_id == ^org_id and s.name == ^name)
+         ) do
+      nil ->
+        %Supplier{organization_id: org_id}
+        |> Supplier.create_changeset(Map.merge(attrs, %{name: name}))
+        |> Repo.insert!()
+
+      supplier ->
+        supplier
     end
   end
 
@@ -238,6 +270,100 @@ for {name, website, support} <- manufacturers_org2 do
 end
 
 IO.puts("    Manufacturers ready")
+
+# ── Departments ───────────────────────────────────────────────────────────────
+
+IO.puts("  Creating departments...")
+
+departments_org1 = [
+  {"Tecnologia da Informação", "TI", "Departamento de sistemas e infraestrutura"},
+  {"Manutenção", "MNT", "Manutenção preventiva e corretiva"},
+  {"Operações", "OPR", "Operações gerais da empresa"},
+  {"Recursos Humanos", "RH", "Gestão de pessoas"},
+  {"Financeiro", "FIN", "Departamento financeiro"}
+]
+
+departments_org2 = [
+  {"Engenharia", "ENG", "Engenharia de produção e manutenção"},
+  {"Produção", "PRD", "Linha de produção"},
+  {"Qualidade", "QUA", "Controle de qualidade"},
+  {"Administração", "ADM", "Administração geral"}
+]
+
+for {name, code, desc} <- departments_org1 do
+  Seeds.get_or_insert_department(org1.id, name, %{code: code, description: desc})
+end
+
+for {name, code, desc} <- departments_org2 do
+  Seeds.get_or_insert_department(org2.id, name, %{code: code, description: desc})
+end
+
+IO.puts("    Departments ready")
+
+# ── Suppliers ─────────────────────────────────────────────────────────────────
+
+IO.puts("  Creating suppliers...")
+
+suppliers_org1 = [
+  %{
+    name: "Distribuidora Tech",
+    contact_name: "Roberto Lima",
+    email: "vendas@distribuidoratech.com.br",
+    phone: "(11) 3456-7890",
+    website: "https://distribuidoratech.com.br",
+    cnpj: "12.345.678/0001-90",
+    address: "Rua da Tecnologia, 1000 - São Paulo, SP"
+  },
+  %{
+    name: "Equipamentos Pro",
+    contact_name: "Fernanda Costa",
+    email: "contato@equipamentospro.com.br",
+    phone: "(11) 9876-5432",
+    website: "https://equipamentospro.com.br",
+    cnpj: "98.765.432/0001-10",
+    address: "Av. Industrial, 500 - Campinas, SP"
+  },
+  %{
+    name: "Segurança Total",
+    contact_name: "Marcos Souza",
+    email: "vendas@seguranatotal.com.br",
+    phone: "(21) 3333-4444",
+    website: "https://seguranatotal.com.br",
+    cnpj: "11.222.333/0001-44",
+    address: "Rua da Segurança, 200 - Rio de Janeiro, RJ"
+  }
+]
+
+suppliers_org2 = [
+  %{
+    name: "Peças Industriais Ltda",
+    contact_name: "Paulo Mendes",
+    email: "vendas@pecasindustriais.com.br",
+    phone: "(31) 3456-7890",
+    website: "https://pecasindustriais.com.br",
+    cnpj: "55.666.777/0001-88",
+    address: "Distrito Industrial, 1500 - Belo Horizonte, MG"
+  },
+  %{
+    name: "Ferramentas Especiais",
+    contact_name: "Lucia Ferreira",
+    email: "contato@ferramentasespeciais.com.br",
+    phone: "(41) 3222-1111",
+    website: "https://ferramentasespeciais.com.br",
+    cnpj: "44.333.222/0001-55",
+    address: "Rua das Máquinas, 800 - Curitiba, PR"
+  }
+]
+
+for supplier <- suppliers_org1 do
+  Seeds.get_or_insert_supplier(org1.id, supplier.name, supplier)
+end
+
+for supplier <- suppliers_org2 do
+  Seeds.get_or_insert_supplier(org2.id, supplier.name, supplier)
+end
+
+IO.puts("    Suppliers ready")
 
 # ── Notifications ────────────────────────────────────────────────────────────
 
